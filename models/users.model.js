@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs")
 
 const Schema = mongoose.Schema;
 
-const UserSchema = Schema({
+const userSchema = Schema({
     username: {
         type: String,
         required: true,
@@ -20,7 +20,7 @@ const UserSchema = Schema({
     }
 });
 
-UserSchema.pre("save", function(next){
+userSchema.pre("save", function(next){
     const user = this
 
     if(this.isModified("password") || this.isNew){
@@ -43,4 +43,4 @@ UserSchema.pre("save", function(next){
     }
 })
 
-module.exports = mongoose.model("User", UserSchema)
+module.exports = mongoose.model("User", userSchema)
