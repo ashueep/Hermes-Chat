@@ -1,0 +1,25 @@
+GET http://localhost:3000/userService
+
+###
+GET http://localhost:3000/userService/616514363a53d3300474ae15
+
+###
+POST http://localhost:3000/userService
+Content-Type: application/json
+
+{
+    "username": "Alan",
+    "password": "4567",
+    "email": "zxc@asd.com"
+}
+
+###
+DELETE http://localhost:3000/userService/61651ca6ff4ce974a9103c34
+
+###
+PATCH http://localhost:3000/userService/616514363a53d3300474ae15
+Content-Type: application/json
+
+{
+    "username": "Alan"
+}
