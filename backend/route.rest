@@ -23,3 +23,16 @@ Content-Type: application/json
 {
     "username": "Sudarshan"
 }
+
+###
+//Login requests
+
+//Login
+POST http://localhost:3000/loginService
+Content-Type: application/json
+
+{
+    "email": "alan@asd.com",
+    "password": "4678",
+    "login": true
+}

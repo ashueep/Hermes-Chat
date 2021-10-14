@@ -16,6 +16,11 @@ const userSchema = Schema({
         type: String,
         required: true,
         unique: true,
+    },
+    logstatus: {
+
+        type: Boolean,
+        required: true
     }
 });
 
