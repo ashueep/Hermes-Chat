@@ -63,11 +63,11 @@ async function getUser(req, res, next) {
         users = await User.find({email: req.body.email})
         if (!users.length) {
         
-            return res.status(404).json({ message: "Cannot find user. Please create new account"}) //Status 404: Not Found
+            return res.status(404).json({ message: "Cannot find user. Please create new account",logstatus: true}) //Status 404: Not Found
         }
         else if(users.length > 1){
 
-            return res.status(500).json({ message: "More than one user with given email found"})
+            return res.status(500).json({ message: "More than one user with given email found",logstatus: false})
         }
     }catch (err) {
       
