@@ -12,6 +12,12 @@ db.once('open', () => console.log('Connected to database'))
 app.use(express.json())
 
 const userRouter = require('./routes/userService')
-app.use('/userService', userRouter)
+app.use('/api/userService/', userRouter)
+
+const messages = require('./routes/messages.js')
+app.use('/api/messages/', messages)
+
+const convo = require('./routes/convos')
+app.use('/api/conversations/', convo)
 
 app.listen(3000, () => console.log("Server Started"))
