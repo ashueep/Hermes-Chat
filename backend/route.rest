@@ -4,11 +4,11 @@ GET http://localhost:3000/userService
 GET http://localhost:3000/userService/616533ddd7f00efca6a02f11
 
 ###
-POST http://localhost:3000/userService
+POST http://localhost:3000/userService/createAccount
 Content-Type: application/json
 
 {
-    "username": "Alan",
+    "username": "Aashish",
     "password": "4678",
     "email": "alan@asd.com"
 }
