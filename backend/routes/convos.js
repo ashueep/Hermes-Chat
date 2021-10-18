@@ -108,8 +108,14 @@ router.post('/:id/addchannel/', async (req, res) => {
             messages: [],
         })
 
+        var hp = {};
+
         if(req.body.view != null){
+            console.log('in this1 statement')
             var allroles = req.body.view
+            //allroles = ["Faculty", "Admin", "Student"]
+            //1: roles = "Faculty"
+            //2: roles = "Admin"
             for(const role of allroles){
                 for(let i = 0 ; i < convo['roles'].length ; i++){
                     if(convo['roles'][i]['name'] == role){
@@ -117,20 +123,29 @@ router.post('/:id/addchannel/', async (req, res) => {
                             chaName: req.body.name,
                             permissions: [1]
                         })
+                        hp[role] = i;
                     }
                 }
             }
         }
 
         if(req.body.write != null){
+            console.log('in this other statement')
             var allroles = req.body.write
+            //allroles = ["Faculty", "Admin"]
+            //1: roles = "Faculty"
+            //2: roles = "Admin"
             for(const role of allroles){
                 for(let i = 0 ; i < convo['roles'].length ; i++){
                     if(convo['roles'][i]['name'] == role){
-                        convo['roles'][i]['channelPermissions'].push({
-                            chaName: req.body.name,
-                            permissions: [2]
-                        })
+                        if(hp[role] == null){
+                            convo['roles'][i]['channelPermissions'].push({
+                                chaName: req.body.name,
+                                permissions: [2]
+                            })
+                        } else {
+                            convo['roles'][i]['channelPermissions'][hp[role]]['permissions'].push(2);
+                        }
                     }
                 }
             }
