@@ -4,13 +4,14 @@ GET http://localhost:3000/api/userService
 GET http://localhost:3000/api/userService/616533ddd7f00efca6a02f11
 
 ###
-POST http://localhost:3000/api/userService
+
+POST http://localhost:3000/userService/createAccount
 Content-Type: application/json
 
 {
-    "username": "user8",
-    "password": "2",
-    "email": "8@asd.com"
+    "username": "Aashish",
+    "password": "4678",
+    "email": "alan@asd.com"
 }
 
 ###
@@ -25,5 +26,15 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3000/api/message/post 
-Con
+
+//Login requests
+
+//Login
+POST http://localhost:3000/loginService
+Content-Type: application/json
+
+{
+    "email": "alan@asd.com",
+    "password": "4678",
+    "login": true
+}

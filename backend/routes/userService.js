@@ -22,21 +22,39 @@ router.get('/:id', getUser, (req, res) => {
 })
 
 //Create one
-router.post('/', async (req, res) => {
+router.post('/createAccount', async (req, res) => {
 
-    const user = new User({
-        username: req.body.username,
-        password: req.body.password,
-        email: req.body.email
-    })
+    let oldUsers
     try{
 
-        const newUser = await user.save()
-        res.status(201).json(newUser)   //Status 201: Created
-    }catch (err) {
+        //Check if user with given email already exists
+        oldUsers = await User.find({email : req.body.email})
+        if(oldUsers.length){
 
-        res.status(400).json({ message: err.message })  //Status 400: Bad Request
-    }
+            res.status(401).json({message: "Account with given email already exists", created: false})
+        }
+        else{
+
+            const user = new User({
+                username: req.body.username,
+                password: req.body.password,
+                email: req.body.email,
+                logstatus: false
+            })
+            try{
+        
+                const newUser = await user.save()
+                res.status(201).json({newUser: newUser, message: "Account created successfully", created: true})   //Status 201: Created
+            }catch (err) {
+        
+                res.status(400).json({ message: err.message, created: false })  //Status 400: Bad Request
+            }
+        }
+
+    } catch(err){
+
+        res.status(500).json({message : err.message, created: false})
+    }    
 })
 
 //Update one

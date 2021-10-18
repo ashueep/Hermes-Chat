@@ -20,4 +20,7 @@ app.use('/api/messages/', messages)
 const convo = require('./routes/convos')
 app.use('/api/conversations/', convo)
 
+const loginRouter = require('./routes/loginService')
+app.use('/loginService', loginRouter)
+
 app.listen(3000, () => console.log("Server Started"))
