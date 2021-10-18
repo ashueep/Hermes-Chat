@@ -1,9 +1,10 @@
-GET http://localhost:3000/userService
+GET http://localhost:3000/api/userService
 
 ###
-GET http://localhost:3000/userService/616533ddd7f00efca6a02f11
+GET http://localhost:3000/api/userService/616533ddd7f00efca6a02f11
 
 ###
+
 POST http://localhost:3000/userService/createAccount
 Content-Type: application/json
 
@@ -14,10 +15,10 @@ Content-Type: application/json
 }
 
 ###
-DELETE http://localhost:3000/userService/616533ddd7f00efca6a02f11
+DELETE http://localhost:3000/api/userService/616533ddd7f00efca6a02f11
 
 ###
-PATCH http://localhost:3000/userService/6165244b6cc82ffcbf251679
+PATCH http://localhost:3000/api/userService/6165244b6cc82ffcbf251679
 Content-Type: application/json
 
 {
@@ -25,6 +26,7 @@ Content-Type: application/json
 }
 
 ###
+
 //Login requests
 
 //Login
