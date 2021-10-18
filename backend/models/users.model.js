@@ -24,8 +24,6 @@ const userSchema = Schema({
     }
 });
 
-const User = mongoose.model('User', userSchema);
-
 userSchema.pre("save", function(next){
     const user = this
 
@@ -59,4 +57,5 @@ userSchema.methods.comparePassword = function(password, callback) {
     })
 }
 
+const User = mongoose.model('User', userSchema);
 module.exports = User
