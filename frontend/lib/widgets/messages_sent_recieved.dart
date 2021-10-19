@@ -7,7 +7,7 @@ class chats_received_sent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        height: 278.0, //just used to test
+        height: 250.0, //just used to test
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
@@ -35,7 +35,7 @@ class chats_received_sent extends StatelessWidget {
                     right: 20.0,
                   ),
                   padding:
-                      EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                      EdgeInsets.symmetric(horizontal: 7.5, vertical: 10.0),
                   decoration: BoxDecoration(
                       color: chats[k].unread ? Color(0xFFFFEFEE) : Colors.white,
                       borderRadius: BorderRadius.only(

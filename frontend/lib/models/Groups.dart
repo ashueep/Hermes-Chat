@@ -1,14 +1,18 @@
 import 'package:chat_app_project/models/user_model.dart';
 
+import 'channels.dart';
+
 class Groups {
   final int G_id;
   final String Group_name;
   final List<USER> Members;
+  final List<CHANNELS> group_channels;
 
   Groups({
     required this.G_id,
     required this.Group_name,
     required this.Members,
+    required this.group_channels,
   });
 }
 
@@ -61,25 +65,30 @@ List<Groups> groups = [
     G_id: 1,
     Group_name: "SE Lab Project",
     Members: [sudarshan, aashish, ashutosh, alan],
+    group_channels: [channels[0],channels[1],channels[2]],
   ),
   Groups(
     G_id: 2,
     Group_name: "Goldman Sachs",
     Members: [sudarshan, john, ashutosh],
+    group_channels: [channels[2]]
   ),
   Groups(
     G_id: 3,
     Group_name: "Oracle",
     Members: [aashish, dolly, alan],
+    group_channels: [channels[0],channels[1]],
   ),
   Groups(
     G_id: 4,
     Group_name: "MATHWORKS",
     Members: [rishikesh, aashish, dolly],
+    group_channels: [channels[2],channels[0]],
   ),
   Groups(
     G_id: 5,
     Group_name: "SE THEORY PROJECT",
     Members: [rishikesh, aashish, dolly, ashutosh],
+    group_channels: [channels[1]],
   ),
 ];

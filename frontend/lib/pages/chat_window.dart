@@ -10,6 +10,7 @@ class Chat_Window extends StatefulWidget {
 }
 
 class _Chat_WindowState extends State<Chat_Window> {
+
   _Build_message(Message person1, bool yes_or_no) {
     final Container message = Container(
       margin: yes_or_no

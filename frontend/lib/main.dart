@@ -1,4 +1,3 @@
-import 'dart:html';
 import 'package:chat_app_project/pages/User_dashboard.dart';
 import 'package:chat_app_project/pages/login_page.dart';
 import 'package:flutter/cupertino.dart';

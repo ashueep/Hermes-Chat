@@ -1,27 +1,35 @@
 import 'package:chat_app_project/models/Sending_login_credentials_to_API.dart';
-import 'package:chat_app_project/pages/User_dashboard.dart';
-import 'package:chat_app_project/pages/create_account_page.dart';
+import 'package:chat_app_project/models/sending_create_account_details.dart';
+import 'package:chat_app_project/pages/login_page.dart';
 import 'package:chat_app_project/repeated_colors/repeated_colors.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class LoginScreen extends StatefulWidget {
+import 'User_dashboard.dart';
+
+class create_account extends StatefulWidget {
+  const create_account({Key? key}) : super(key: key);
+
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _create_accountState createState() => _create_accountState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final Username_controller = TextEditingController();
-  final Password_controller = TextEditingController();
+class _create_accountState extends State<create_account> {
+  @override
+  final Name_controller = TextEditingController();
+  final email_controller = TextEditingController();
+  final password_controller = TextEditingController();
+  final confirm_password_controller = TextEditingController();
   bool _rememberMe = false;
 
-  void _showDialog_for_login_failure(BuildContext context) {
+  void _showDialog_for_password_mismatch(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: new Text("Alert!"),
-          content: new Text("Wrong username or password"),
+          content: new Text("Passwords do not match!"),
           actions: <Widget>[
             new FlatButton(
               child: new Text("OK"),
@@ -32,6 +40,62 @@ class _LoginScreenState extends State<LoginScreen> {
           ],
         );
       },
+    );
+  }
+
+  void _showDialog_for_failed_account_creation(BuildContext context,String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: new Text("Alert!"),
+          content: new Text(message),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _build_name_field() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          'Name',
+          style: kLabelStyle,
+        ),
+        SizedBox(height: 10.0),
+        Container(
+          alignment: Alignment.centerLeft,
+          decoration: kBoxDecorationStyle,
+          height: 60.0,
+          child: TextField(
+            controller: Name_controller,
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: 'OpenSans',
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.only(top: 14.0),
+              prefixIcon: Icon(
+                Icons.email,
+                color: Colors.white,
+              ),
+              hintText: 'Enter your full name',
+              hintStyle: kHintTextStyle,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -49,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextField(
-            controller: Username_controller,
+            controller: email_controller,
             keyboardType: TextInputType.emailAddress,
             style: TextStyle(
               color: Colors.white,
@@ -62,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Icons.email,
                 color: Colors.white,
               ),
-              hintText: 'Enter Username',
+              hintText: 'Enter Your email',
               hintStyle: kHintTextStyle,
             ),
           ),
@@ -71,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildPasswordTF() {
+  Widget _buildPasswordToCreateTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -85,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextField(
-            controller: Password_controller,
+            controller: password_controller,
             obscureText: true,
             style: TextStyle(
               color: Colors.white,
@@ -98,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Icons.lock,
                 color: Colors.white,
               ),
-              hintText: 'Enter your Password',
+              hintText: 'Enter a Password',
               hintStyle: kHintTextStyle,
             ),
           ),
@@ -107,31 +171,56 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildForgotPasswordBtn() {
-    return Container(
-      alignment: Alignment.centerRight,
-      child: FlatButton(
-        onPressed: () => print('Forgot Password Button Pressed'),
-        padding: EdgeInsets.only(right: 0.0),
-        child: Text(
-          'Forgot Password?',
+  Widget _buildPasswordToConfirmTF() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          'Confirm Password',
           style: kLabelStyle,
         ),
-      ),
+        SizedBox(height: 10.0),
+        Container(
+          alignment: Alignment.centerLeft,
+          decoration: kBoxDecorationStyle,
+          height: 60.0,
+          child: TextField(
+            controller: confirm_password_controller,
+            obscureText: true,
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: 'OpenSans',
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.only(top: 14.0),
+              prefixIcon: Icon(
+                Icons.lock,
+                color: Colors.white,
+              ),
+              hintText: 'Confrim Password',
+              hintStyle: kHintTextStyle,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildLoginBtn() {
+
+  Widget _buildCreateAccountBtn() {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 25.0),
       width: double.infinity,
       child: RaisedButton(
         elevation: 5.0,
         onPressed: () async {
-             final List<String> reponse_from_API_for_login = await sendData((Username_controller.text).toString(),(Password_controller.text).toString());
-             reponse_from_API_for_login[1]=="true" ?
-           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => User_dashboard())) : _showDialog_for_login_failure(context);
+          final List<String> reponse_from_API_for_create_account = await send_create_account((Name_controller.text).toString(),(password_controller.text).toString(),(email_controller.text).toString());
+          reponse_from_API_for_create_account[1]=="true" ?
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => LoginScreen())) : _showDialog_for_failed_account_creation(context, reponse_from_API_for_create_account[0]);
+          if(password_controller.text!=confirm_password_controller.text)
+            _showDialog_for_password_mismatch(context);
         },
         padding: EdgeInsets.all(15.0),
         shape: RoundedRectangleBorder(
@@ -139,7 +228,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         color: Colors.white,
         child: Text(
-          'LOGIN',
+          'CREATE ACCOUNT',
           style: TextStyle(
             color: Color(0xFF527DAA),
             letterSpacing: 1.5,
@@ -152,37 +241,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildSignupBtn() {
-    return GestureDetector(
-      onTap: () => Navigator.push(context,
-          MaterialPageRoute(builder: (context) => create_account())),//Navigator.push(context,
-          //MaterialPageRoute(builder: (context) => create_account())),
-      child: RichText(
-        text: TextSpan(
-          children: [
-            TextSpan(
-              text: 'Don\'t have an Account? ',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.0,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-            TextSpan(
-              text: 'Sign Up',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: AnnotatedRegion<SystemUiOverlayStyle>(
@@ -220,7 +279,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Text(
-                        'HERMES Sign In',
+                        'HERMES Create Account',
                         style: TextStyle(
                           color: Colors.white,
                           fontFamily: 'OpenSans',
@@ -229,14 +288,16 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       SizedBox(height: 30.0),
-                      _buildEmailTF(),
+                      _build_name_field(),
                       SizedBox(
                         height: 30.0,
                       ),
-                      _buildPasswordTF(),
-                      _buildForgotPasswordBtn(),
-                      _buildLoginBtn(),
-                      _buildSignupBtn(),
+                      _buildEmailTF(),
+                      SizedBox(height: 30.0),
+                      _buildPasswordToCreateTF(),
+                      SizedBox(height: 30.0),
+                      _buildPasswordToConfirmTF(),
+                    _buildCreateAccountBtn(),
                     ],
                   ),
                 ),
