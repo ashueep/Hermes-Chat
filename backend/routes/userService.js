@@ -1,9 +1,15 @@
 const express = require('express')
 const router = express.Router()
 const User = require('../models/users.model')
+const jwt = require('jsonwebtoken')
+const auth = require("../middleware/auth");
 
+//TODO: To be removed after testing
+const fs = require('fs')
+
+//For debug purposes only
 //Getting all
-router.get('/', async (req, res) => {
+router.get('/getAccounts/',  async (req, res) => {
 
     try {
 
@@ -15,32 +21,58 @@ router.get('/', async (req, res) => {
     }
 })
 
+//For debug purposes only
 //Getting one
-router.get('/:id', getUser, (req, res) => {
+router.get('/getAccount/:id', async (req, res) => {
   
-    res.json(res.user)
-})
-
-//Create one
-router.post('/', async (req, res) => {
-
-    const user = new User({
-        username: req.body.username,
-        password: req.body.password,
-        email: req.body.email
-    })
     try{
+        
+        let user =await User.findById(req.params.id)
+        res.status(200).json(user)
+    } catch (err){
 
-        const newUser = await user.save()
-        res.status(201).json(newUser)   //Status 201: Created
-    }catch (err) {
-
-        res.status(400).json({ message: err.message })  //Status 400: Bad Request
+        res.status(500).json({message: err.message})    //Status 500: Internal Server Error
     }
 })
 
-//Update one
-router.patch('/:id', getUser, async (req, res) => {
+//Create account
+router.post('/createAccount', async (req, res) => {
+
+    let oldUsers
+    try{
+
+        //Check if user with given email already exists
+        oldUsers = await User.find({email : req.body.email})
+        if(oldUsers.length){
+
+            res.status(401).json({message: "Account with given email already exists", created: false})
+        }
+        else{
+
+            const user = new User({
+                username: req.body.username,
+                password: req.body.password,
+                email: req.body.email,
+                logstatus: false
+            })
+            try{
+        
+                const newUser = await user.save()
+                res.status(201).json({newUser: newUser, message: "Account created successfully", created: true})   //Status 201: Created
+            }catch (err) {
+        
+                res.status(400).json({ message: err.message, created: false })  //Status 400: Bad Request
+            }
+        }
+
+    } catch(err){
+
+        res.status(500).json({message : err.message, created: false})
+    }    
+})
+
+//Update account
+router.patch('/modifyAccount', auth, async (req, res) => {
     
     if (req.body.username != null) {
         
@@ -50,10 +82,7 @@ router.patch('/:id', getUser, async (req, res) => {
         
         res.user.password = req.body.password
     }
-    if (req.body.email != null) {
-        
-        res.user.email = req.body.email
-    }
+
     try{
     
         const updatedUser = await res.user.save()
@@ -65,7 +94,7 @@ router.patch('/:id', getUser, async (req, res) => {
 })
 
 //Delete one
-router.delete('/:id', getUser, async (req, res) => {
+router.delete('/deleteAccount', auth, async (req, res) => {
     
     try {
 
@@ -77,21 +106,90 @@ router.delete('/:id', getUser, async (req, res) => {
     }
 })
 
-async function getUser(req, res, next) {
-    let user
-    try {
-        user = await User.findById(req.params.id)
-        if (user == null) {
-        
-            return res.status(404).json({ message: 'Cannot find user' })
+//TODO: This function need not use getUser
+//Login
+router.post('/login', async (req, res) => {
+
+    try{
+
+        //Find user with requested email
+        const user = await User.findOne({email: req.body.email})
+        if(!user){
+
+            return res.status(404).json({message: "User with given email not found. Please create an account", logstatus: false})
         }
-    }catch (err) {
-      
-        return res.status(500).json({ message: err.message })   //Status 500: Internal Server Error
+        res.user = user
+
+
+        if(res.user.logstatus){
+
+            res.status(200).json({message: "User is already logged in", logstatus: res.user.logstatus})
+        }
+        else{
+            
+            //Compare password with stored password
+            res.user.comparePassword(req.body.password, async (error, match) => {
+
+                if(!match){
+
+                    return res.status(401).json({message: "Wrong email or password", logstatus: res.user.logstatus})  //Status 401: Unauthorized
+                }
+                else{
+
+                    //Update log status
+                    res.user.logstatus = true
+                    await res.user.save()
+
+                    const token = jwt.sign(
+                        { email: res.user.email },
+                        process.env.JWT_KEY,
+                        {
+                            expiresIn: process.env.JWT_EXPIRY   //Example: "2h"
+                        }
+                    );
+
+                    //TODO: To be removed after testing
+                    const content = "Email: " + res.user.email + ", Token: " + token + "\n"
+                    fs.appendFile('./debug.log', content, err => {
+                        if (err) {
+                          console.log(err.message)
+                        }
+                        //file written successfully
+                    })
+                    res.status(200).json({message: "Login successful", logstatus: res.user.logstatus, token: token}) //Status 200: OK
+                }
+            })
+        }
+        
+    } catch(err){
+
+        res.status(500).json({message: err.message})    //Status 500: Internal server error
     }
-  
-    res.user = user
-    next()
-  }
+})
+
+//Logout
+router.post('/logout', auth, async (req, res) => {
+    
+    try{
+
+        if(!res.user.logstatus){
+                
+            res.status(200).json({message: "User is already logged out", logstatus: res.user.logstatus})
+        }
+        else{
+    
+            //Update log status
+            res.user.logstatus = false
+            await res.user.save()
+            
+            res.status(200).json({message: "Logout successful", logstatus: res.user.logstatus})
+        }
+    }
+    catch(err){
+
+        res.status(500).json({message: err.message})    //Status 500: Internal server error
+    }
+    
+})
 
 module.exports = router

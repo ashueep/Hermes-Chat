@@ -1,25 +1,51 @@
-GET http://localhost:3000/userService
+GET http://localhost:3000/api/userService/getAccounts
 
 ###
-GET http://localhost:3000/userService/616533ddd7f00efca6a02f11
+GET http://localhost:3000/api/userService/getAccount/616533ddd7f00efca6a02f11
 
 ###
-POST http://localhost:3000/userService
+
+POST http://localhost:3000/api/userService/createAccount
 Content-Type: application/json
 
 {
-    "username": "Alan",
-    "password": "4678",
-    "email": "alan@asd.com"
+    "username": "Aashish",
+    "password": "1234",
+    "email": "aashish@asd.com"
 }
 
 ###
-DELETE http://localhost:3000/userService/616533ddd7f00efca6a02f11
-
-###
-PATCH http://localhost:3000/userService/6165244b6cc82ffcbf251679
+DELETE http://localhost:3000/api/userService/deleteAccount
 Content-Type: application/json
 
 {
-    "username": "Sudarshan"
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFhc2hpc2hAYXNkLmNvbSIsImlhdCI6MTYzNDYyNjQ4MiwiZXhwIjoxNjM0NjMzNjgyfQ.RyHLTQl2Wh_0nhbY7wZLUEfqxSikcPs5ftEAyLW9MK4"
+}
+
+###
+PATCH http://localhost:3000/api/userService/modifyAccount
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFhc2hpc2hAYXNkLmNvbSIsImlhdCI6MTYzNDYyNjc2NCwiZXhwIjoxNjM0NjMzOTY0fQ.Yw5NUNzZHTmjl0DoDwz7Ll27CsxPfSsd2z-RisD2iww",
+    "password": "1234"
+}
+
+###
+//Login
+POST http://localhost:3000/api/userService/login
+Content-Type: application/json
+
+{
+    "email": "aashish@asd.com",
+    "password": "1234"
+}
+
+###
+//Logout
+POST http://localhost:3000/api/userService/logout
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFhc2hpc2hAYXNkLmNvbSIsImlhdCI6MTYzNDYyNjM4MSwiZXhwIjoxNjM0NjMzNTgxfQ.OjynQlFBiF1Cm0OoM0IvYG760fe6gU9aGfngYHFarBE"
 }

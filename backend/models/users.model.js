@@ -16,6 +16,11 @@ const userSchema = Schema({
         type: String,
         required: true,
         unique: true,
+    },
+    logstatus: {
+
+        type: Boolean,
+        required: true
     }
 });
 
@@ -52,4 +57,5 @@ userSchema.methods.comparePassword = function(password, callback) {
     })
 }
 
-module.exports = mongoose.model("User", userSchema)
+const User = mongoose.model('User', userSchema);
+module.exports = User
