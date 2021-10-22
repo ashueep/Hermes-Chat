@@ -9,9 +9,10 @@ POST http://localhost:3000/api/userService/createAccount
 Content-Type: application/json
 
 {
-    "username": "Aashish",
+    "username": "Bruh123",
+    "fullname": "Alan the nub",
     "password": "1234",
-    "email": "aashish@asd.com"
+    "email": "alan.blah@python.com"
 }
 
 ###
@@ -37,7 +38,7 @@ POST http://localhost:3000/api/userService/login
 Content-Type: application/json
 
 {
-    "email": "aashish@asd.com",
+    "email": "alan.blah@python.com",
     "password": "1234"
 }
 
@@ -47,5 +48,5 @@ POST http://localhost:3000/api/userService/logout
 Content-Type: application/json
 
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFhc2hpc2hAYXNkLmNvbSIsImlhdCI6MTYzNDYyNjM4MSwiZXhwIjoxNjM0NjMzNTgxfQ.OjynQlFBiF1Cm0OoM0IvYG760fe6gU9aGfngYHFarBE"
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ik9zaXMiLCJpYXQiOjE2MzQ4ODE4NTYsImV4cCI6MTYzNDg4OTA1Nn0.t4dJh-l5G1iTYqO082YcxfI0A2mb6T5FkZjUOIYY1t8"
 }

@@ -6,7 +6,11 @@ const Schema = mongoose.Schema;
 const userSchema = Schema({
     username: {
         type: String,
-        required: true
+        unique: true,
+        require: true
+    },
+    fullname: {
+        type: String    //Not required (if not specified, username is taken as full name)
     },
     password: {
         type: String,

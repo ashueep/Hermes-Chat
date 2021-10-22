@@ -22,7 +22,7 @@ const verifyToken = async (req, res, next) => {
     //Find user with verified JWT token
     try{
          
-        let user = await User.findOne({email: req.user.email})
+        let user = await User.findOne({username: req.user.username})
         if(!user){
 
             return res.status(404).json({message: "No user with given email found"})    //Status 401: Not Found
