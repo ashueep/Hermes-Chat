@@ -24,8 +24,8 @@ const convo = require('./routes/convos')
 app.use('/api/conversations/', convo)
 
 var https_options = {
-    key: fs.readFileSync('./cert/CA/HermesHost/HermesHost.decrypted.key'),
-    cert: fs.readFileSync('./cert/CA/HermesHost/HermesHost.crt')
+    key: fs.readFileSync('./security/cert.key'),
+    cert: fs.readFileSync('./security/cert.pem')
 };
 
 //app.listen(parseInt(process.env.PORT), () => console.log("Server Started"))

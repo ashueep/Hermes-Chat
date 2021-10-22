@@ -1,4 +1,4 @@
-GET https://localhost:3000/api/userService/getAccounts
+GET https://localhost:3001/api/userService/getAccounts
 
 ###
 GET http://localhost:3000/api/userService/getAccount/616533ddd7f00efca6a02f11
