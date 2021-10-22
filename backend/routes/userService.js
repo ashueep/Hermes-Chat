@@ -41,16 +41,41 @@ router.post('/createAccount', async (req, res) => {
     let oldUsers
     try{
 
+        if(!validateEmail(req.body.email)){
+
+            return res.status(400).json({message: "Email is not valid", created: false})
+        }
+
         //Check if user with given email already exists
         oldUsers = await User.find({email : req.body.email})
-        if(oldUsers.length){
+        if(!oldUsers || oldUsers.length){
 
             res.status(401).json({message: "Account with given email already exists", created: false})
         }
         else{
 
+            let username, fullname
+
+            username = req.body.username.replace(/^[w-]/g, '_')
+
+            oldUsers = await User.find({username: username})
+            if(!oldUsers || oldUsers.length){
+
+                return res.status(400).json({message: "username already exists", created: false})
+            }
+
+            if(!("fullname" in req.body) || !req.body.fullname || !(req.body.fullname.length)){
+
+                fullname = username
+            }
+            else{
+
+                fullname = req.body.fullname
+            }
+
             const user = new User({
-                username: req.body.username,
+                username: username,
+                fullname: fullname,
                 password: req.body.password,
                 email: req.body.email,
                 logstatus: false
@@ -141,7 +166,7 @@ router.post('/login', async (req, res) => {
                     await res.user.save()
 
                     const token = jwt.sign(
-                        { email: res.user.email },
+                        { username: res.user.username },
                         process.env.JWT_KEY,
                         {
                             expiresIn: process.env.JWT_EXPIRY   //Example: "2h"
@@ -191,5 +216,11 @@ router.post('/logout', auth, async (req, res) => {
     }
     
 })
+
+function validateEmail(email) 
+{
+    var re = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
+    return re.test(email)
+}
 
 module.exports = router
