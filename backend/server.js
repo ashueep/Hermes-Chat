@@ -24,10 +24,10 @@ const convo = require('./routes/convos')
 app.use('/api/conversations/', convo)
 
 var https_options = {
-    key: fs.readFileSync('./cert/CA/HermesHost/HermesHost.decrypted.key'),
-    cert: fs.readFileSync('./cert/CA/HermesHost/HermesHost.crt')
+    key: fs.readFileSync('./security/cert.key'),
+    cert: fs.readFileSync('./security/cert.pem')
 };
 
 //app.listen(parseInt(process.env.PORT), () => console.log("Server Started"))
-http.createServer(app).listen(process.env.HTTP_PORT, () => console.log("HTTP Server Started"))
-https.createServer(https_options, app).listen(process.env.HTTPS_PORT, () => console.log("HTTPS Server Started"))
+const httpServer = http.createServer(app).listen(process.env.HTTP_PORT, () => console.log("HTTP Server Started"))
+const httpsServer = https.createServer(https_options, app).listen(process.env.HTTPS_PORT, () => console.log("HTTPS Server Started"))
