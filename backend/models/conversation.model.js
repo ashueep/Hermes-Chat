@@ -35,9 +35,21 @@ const convoSchema = mongoose.Schema({
             permissions: [Number]
         }]
     }],
-    events: {
-        
-    }
+    events: [{
+        name: {
+            type: String,
+            required: true,
+        },
+        datetime: {
+            type: Date,
+        },
+        description: {
+            type: String,
+        },
+        attendees: [{
+            type: String,
+        }]
+    }]
 });
 
 module.exports = mongoose.model("Conversation", convoSchema)
