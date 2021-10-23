@@ -1,4 +1,5 @@
 import 'package:chat_app_project/models/Sending_login_credentials_to_API.dart';
+import 'package:chat_app_project/pages/Groups_Page.dart';
 import 'package:chat_app_project/pages/User_dashboard.dart';
 import 'package:chat_app_project/pages/create_account_page.dart';
 import 'package:chat_app_project/repeated_colors/repeated_colors.dart';
@@ -7,17 +8,17 @@ import 'package:flutter/services.dart';
 
 import '../global_variables.dart';
 
-class LoginScreen extends StatefulWidget {
+class create_new_account_DM extends StatefulWidget {
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _create_new_account_DM createState() => _create_new_account_DM();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final Username_controller = TextEditingController();
+class _create_new_account_DM extends State<create_new_account_DM> {
+  final Group_name_controller = TextEditingController();
   final Password_controller = TextEditingController();
   bool _rememberMe = false;
 
-  void _showDialog_for_login_failure(BuildContext context,String message) {
+  void _showDialog_for_create_new_group_failure(BuildContext context,String message) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -37,12 +38,12 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildEmailTF() {
+  Widget _buildCreateNewDMTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          'Email',
+          'Username',
           style: kLabelStyle,
         ),
         SizedBox(height: 10.0),
@@ -51,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextField(
-            controller: Username_controller,
+            controller: Group_name_controller,
             keyboardType: TextInputType.emailAddress,
             style: TextStyle(
               color: Colors.white,
@@ -61,10 +62,10 @@ class _LoginScreenState extends State<LoginScreen> {
               border: InputBorder.none,
               contentPadding: EdgeInsets.only(top: 14.0),
               prefixIcon: Icon(
-                Icons.email,
+                Icons.group,
                 color: Colors.white,
               ),
-              hintText: 'Enter Username',
+              hintText: 'Enter User Name',
               hintStyle: kHintTextStyle,
             ),
           ),
@@ -73,67 +74,17 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildPasswordTF() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          'Password',
-          style: kLabelStyle,
-        ),
-        SizedBox(height: 10.0),
-        Container(
-          alignment: Alignment.centerLeft,
-          decoration: kBoxDecorationStyle,
-          height: 60.0,
-          child: TextField(
-            controller: Password_controller,
-            obscureText: true,
-            style: TextStyle(
-              color: Colors.white,
-              fontFamily: 'OpenSans',
-            ),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.only(top: 14.0),
-              prefixIcon: Icon(
-                Icons.lock,
-                color: Colors.white,
-              ),
-              hintText: 'Enter your Password',
-              hintStyle: kHintTextStyle,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 
-  Widget _buildForgotPasswordBtn() {
-    return Container(
-      alignment: Alignment.centerRight,
-      child: FlatButton(
-        onPressed: () => print('Forgot Password Button Pressed'),
-        padding: EdgeInsets.only(right: 0.0),
-        child: Text(
-          'Forgot Password?',
-          style: kLabelStyle,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLoginBtn() {
+  Widget _buildCreateAccountBtn() {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 25.0),
       width: double.infinity,
       child: RaisedButton(
         elevation: 5.0,
         onPressed: () async {
-             final List<String> reponse_from_API_for_login = await sendData((Username_controller.text).toString(),(Password_controller.text).toString());
-             reponse_from_API_for_login[1]=="true" ?
-           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => User_dashboard())) : _showDialog_for_login_failure(context,reponse_from_API_for_login[0]);
+          //final List<String> reponse_from_API_for_login = await sendData((Group_name_controller.text).toString(),(Password_controller.text).toString());
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => Group_Page()));
         },
         padding: EdgeInsets.all(15.0),
         shape: RoundedRectangleBorder(
@@ -141,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         color: Colors.white,
         child: Text(
-          'LOGIN',
+          'CREATE',
           style: TextStyle(
             color: Color(0xFF527DAA),
             letterSpacing: 1.5,
@@ -154,35 +105,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildSignupBtn() {
-    return GestureDetector(
-      onTap: () => Navigator.push(context,
-          MaterialPageRoute(builder: (context) => create_account())),//Navigator.push(context,
-          //MaterialPageRoute(builder: (context) => create_account())),
-      child: RichText(
-        text: TextSpan(
-          children: [
-            TextSpan(
-              text: 'Don\'t have an Account? ',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.0,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-            TextSpan(
-              text: 'Sign Up',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -222,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Text(
-                        'HERMES Sign In',
+                        'Start new HERMES Direct Message',
                         style: TextStyle(
                           color: Colors.white,
                           fontFamily: 'OpenSans',
@@ -231,14 +153,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       SizedBox(height: 30.0),
-                      _buildEmailTF(),
+                      _buildCreateNewDMTF(),
                       SizedBox(
                         height: 30.0,
                       ),
-                      _buildPasswordTF(),
-                      _buildForgotPasswordBtn(),
-                      _buildLoginBtn(),
-                      _buildSignupBtn(),
+                      _buildCreateAccountBtn(),
+
                     ],
                   ),
                 ),

@@ -4,7 +4,7 @@ class Message {
   final USER sender;
   final String time;
   final String text;
-  final bool isLiked;
+  final bool isLiked; //remove this
   final bool unread;
 
   Message({

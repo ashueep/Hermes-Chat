@@ -1,20 +1,56 @@
 import 'package:chat_app_project/models/Groups.dart';
-import 'package:chat_app_project/models/message_model.dart';
 import 'package:chat_app_project/pages/Groups_Page.dart';
-import 'package:chat_app_project/pages/chat_window.dart';
-import 'package:chat_app_project/pages/group_channels.dart';
+import 'package:chat_app_project/pages/edit_roles_and_permissions.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class Groups_chats extends StatelessWidget {
+class new_list_of_roles extends StatefulWidget {
+  const new_list_of_roles({Key? key}) : super(key: key);
+
+  @override
+  _new_list_of_rolesState createState() => _new_list_of_rolesState();
+}
+
+class _new_list_of_rolesState extends State<new_list_of_roles> {
+  List<String> roles=["Teacher","Student","Principal","Administrator"];
+  List<Color> colors=[Colors.lightBlue,Colors.lightBlueAccent,Colors.lightGreen,Colors.lightGreenAccent,Colors.lime,Colors.limeAccent];
   @override
 
-  void _showDialog_for_confirm_delete_account(BuildContext context) {
+  Widget _buildNewRoleBtn() {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 25.0),
+      width: double.infinity,
+      child: RaisedButton(
+        elevation: 5.0,
+        onPressed: () async {
+          print("add new role button pressed");
+        },
+        padding: EdgeInsets.all(15.0),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30.0),
+        ),
+        color: Colors.white,
+        child: Text(
+          'ADD NEW ROLE',
+          style: TextStyle(
+            color: Color(0xFF527DAA),
+            letterSpacing: 1.5,
+            fontSize: 18.0,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'OpenSans',
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showDialog_for_confirm_delete_account(BuildContext context,String role) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: new Text("Alert!"),
-          content: new Text("Are you sure you want to delete this group?"),
+          content: new Text("Are you sure you want to delete the role $role?"),
           actions: <Widget>[
             new FlatButton(
               child: new Text("CANCEL"),
@@ -25,7 +61,7 @@ class Groups_chats extends StatelessWidget {
             new FlatButton(
                 onPressed: () {Navigator.push(context,
                     MaterialPageRoute(builder: (context) => Group_Page()));},
-                 child: new Text("YES"))
+                child: new Text("YES"))
           ],
         );
       },
@@ -49,23 +85,20 @@ class Groups_chats extends StatelessWidget {
             topRight: Radius.circular(28.0),
           ),
           child: ListView.builder(
-            itemCount: groups.length,
+            itemCount: roles.length,
             itemBuilder: (BuildContext context, int k) {
               return GestureDetector(
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => group_channels(channels: groups[k].group_channels,group: groups[k],))),
+                onTap: () {print("role pressed");},
                 child: Container(
                   margin: EdgeInsets.only(
                     top: 5.0,
                     bottom: 5.0,
-                    right: 20.0,
+                    right: 10.0,
                   ),
                   padding:
-                      EdgeInsets.symmetric(horizontal: 7.5, vertical: 10.0),
+                  EdgeInsets.symmetric(horizontal: 7.5, vertical: 10.0),
                   decoration: BoxDecoration(
-                      color: chats[k].unread ? Color(0xFFFFEFEE) : Colors.white,
+                      color: colors[k],
                       borderRadius: BorderRadius.only(
                         topRight: Radius.circular(20.0),
                         bottomRight: Radius.circular(20.0),
@@ -75,11 +108,6 @@ class Groups_chats extends StatelessWidget {
                     children: <Widget>[
                       Row(
                         children: [
-                          CircleAvatar(
-                            radius: 35.0,
-                            backgroundImage:
-                                AssetImage(chats[k].sender.imageUrl),
-                          ),
                           SizedBox(width: 10.0),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,16 +115,15 @@ class Groups_chats extends StatelessWidget {
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.50,
                                 child: Text(
-                                  groups[k].Group_name,
+                                  roles[k],
                                   style: TextStyle(
-                                    color: Colors.blueGrey,
+                                    color: Colors.black,
                                     fontSize: 20.0,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w300,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              SizedBox(height: 5.0),
                             ],
                           ),
                         ],
@@ -107,53 +134,28 @@ class Groups_chats extends StatelessWidget {
                             return [
                               PopupMenuItem(
                                 value: 'edit',
-                                child: Text('Edit',style: TextStyle(fontWeight: FontWeight.bold),),
+                                child: Text('Edit Role',style: TextStyle(fontWeight: FontWeight.bold),),
                               ),
                               PopupMenuItem(
                                 value: 'delete',
-                                child: Text('Delete', style: TextStyle(fontWeight: FontWeight.bold),),
+                                child: Text('Delete Role', style: TextStyle(fontWeight: FontWeight.bold),),
                               ),
                             ];
                           },
                             onSelected: (String value){
-                            if(value=='edit'){
-                              print("edit value pressed");
-                            }
-                            else if(value=='delete')
+                              if(value=='edit'){
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) => edit_roles_and_permissions()));
+                              }
+                              else if(value=='delete')
                               {
-                                _showDialog_for_confirm_delete_account(context);
+                                _showDialog_for_confirm_delete_account(context, groups[k].Group_name);
                               }
                             },
                           ),
 
-                          Text(
-                            chats[k].time,
-                            style: TextStyle(
-                              color: Colors.blueGrey,
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
                           SizedBox(height: 2.5),
-                          chats[k].unread
-                              ? Container(
-                                  width: 40.0,
-                                  height: 20.0,
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).primaryColor,
-                                    borderRadius: BorderRadius.circular(28.0),
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    'NEW',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 13.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                )
-                              : Text(''),
+
                         ],
                       ),
                     ],
