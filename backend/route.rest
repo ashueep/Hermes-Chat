@@ -9,10 +9,10 @@ POST http://localhost:3000/api/userService/createAccount
 Content-Type: application/json
 
 {
-    "username": "Bruh123",
-    "fullname": "Alan the nub",
-    "password": "1234",
-    "email": "alan.blah@python.com"
+    "username": "user6",
+    "fullname": "user 6",
+    "password": "12344",
+    "email": "user6@python.com"
 }
 
 ###
@@ -38,7 +38,7 @@ POST http://localhost:3000/api/userService/login
 Content-Type: application/json
 
 {
-    "email": "alan.blah@python.com",
+    "email": "user1@python.com",
     "password": "1234"
 }
 
@@ -48,5 +48,24 @@ POST http://localhost:3000/api/userService/logout
 Content-Type: application/json
 
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ik9zaXMiLCJpYXQiOjE2MzQ4ODE4NTYsImV4cCI6MTYzNDg4OTA1Nn0.t4dJh-l5G1iTYqO082YcxfI0A2mb6T5FkZjUOIYY1t8"
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIxIiwiaWF0IjoxNjM0OTg3Mjc5LCJleHAiOjE2MzQ5OTQ0Nzl9.hFU4g5EdeqT0CuSM91zNJuQ7SovYruh1qHMCb8NDvGQ"
+}
+
+###
+
+//view messages in dm (initial GET request)
+GET http://localhost:3000/api/dms/6173f12261848616742b392a/view
+
+{
+    "token" :
+}
+
+###
+
+//create dm after querying username
+POST http://localhost:3000/api/dms/create
+
+{
+    "token" : "asd",
+    "username" : "Asd"
 }
