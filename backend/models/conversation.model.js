@@ -34,7 +34,10 @@ const convoSchema = mongoose.Schema({
             chaName: String,
             permissions: [Number]
         }]
-    }]
+    }],
+    events: {
+        
+    }
 });
 
 module.exports = mongoose.model("Conversation", convoSchema)
