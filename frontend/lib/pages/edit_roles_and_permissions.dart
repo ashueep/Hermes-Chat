@@ -1,22 +1,17 @@
-import 'dart:ui';
-import 'package:chat_app_project/pages/create_new_group.dart';
-import 'package:chat_app_project/widgets/Category_selector.dart';
-import 'package:chat_app_project/widgets/Category_selector_for_groups.dart';
-import 'package:chat_app_project/widgets/Groups_chats.dart';
-import 'package:chat_app_project/widgets/messages_sent_recieved.dart';
-import 'package:chat_app_project/widgets/recent_chats_widget.dart';
+import 'package:chat_app_project/widgets/List_of_roles.dart';
+import 'package:chat_app_project/widgets/permisssion_for_a_particular_role.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-class Group_Page extends StatefulWidget {
-  Group_Page({Key? key}) : super(key: key);
+class edit_roles_and_permissions extends StatefulWidget {
+  const edit_roles_and_permissions({Key? key}) : super(key: key);
 
   @override
-  _Group_PageState createState() => _Group_PageState();
+  _edit_roles_and_permissionsState createState() => _edit_roles_and_permissionsState();
 }
 
-class _Group_PageState extends State<Group_Page> {
-
+class _edit_roles_and_permissionsState extends State<edit_roles_and_permissions> {
+  int curr_index=0;
   void _showDialog_for_login_failure(BuildContext context,String message) {
     showDialog(
       context: context,
@@ -39,13 +34,30 @@ class _Group_PageState extends State<Group_Page> {
 
   @override
   Widget build(BuildContext context) {
+
+    void onTabTapped(int index) {
+      if(index==0)
+        {
+
+        }
+    }
+
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => create_new_account()));
-        },
-        child: const Icon(Icons.add_circle_outline_sharp),
+      //floatingActionButton: FloatingActionButton(
+      //  onPressed: () {
+      //   Navigator.push(context,
+      //        MaterialPageRoute(builder: (context) => create_new_account()));
+      //  },
+      //  child: const Icon(Icons.add_circle_outline_sharp),
+      //),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.orange,
+        onTap: onTabTapped,
+        currentIndex: curr_index,
+        items: [BottomNavigationBarItem(icon: Icon(Icons.add_box_outlined), label: "CONFIRM CHANGES"),
+          BottomNavigationBarItem(icon: Icon(Icons.arrow_back_ios_new_outlined), label: "RETURN"),
+        ],
+
       ),
       backgroundColor: Colors.red,
       appBar: AppBar(
@@ -58,7 +70,7 @@ class _Group_PageState extends State<Group_Page> {
           onPressed: () {},
         ),
         title: Text(
-          "Groups",
+          "Permissions",
           style: TextStyle(
             color: Colors.white,
             fontSize: 30.0,
@@ -76,7 +88,6 @@ class _Group_PageState extends State<Group_Page> {
       ),
       body: Column(
         children: <Widget>[
-          CategorySelector_for_group(),
           Expanded(
             child: Container(
               decoration: BoxDecoration(
@@ -88,7 +99,8 @@ class _Group_PageState extends State<Group_Page> {
               child: Column(
                 children: <Widget>[
 
-                  Groups_chats(),
+                  permission_for_a_particular_role(),
+
                 ],
               ),
             ),

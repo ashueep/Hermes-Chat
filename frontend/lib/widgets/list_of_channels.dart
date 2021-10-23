@@ -1,11 +1,36 @@
+import 'package:chat_app_project/models/Groups.dart';
 import 'package:chat_app_project/models/channels.dart';
 import 'package:chat_app_project/models/message_model.dart';
+import 'package:chat_app_project/pages/Groups_Page.dart';
 import 'package:chat_app_project/pages/chat_window.dart';
+import 'package:chat_app_project/pages/group_channels.dart';
 import 'package:flutter/material.dart';
 
 class list_of_channels extends StatelessWidget {
   final List<CHANNELS> channels;
   list_of_channels({required this.channels});
+  void _showDialog_for_confirm_delete_account(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: new Text("Alert!"),
+          content: new Text("Are you sure you want to delete this group?"),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("CANCEL"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton(
+                onPressed: () {print("Deleting the channel is requested");},
+                child: new Text("YES"))
+          ],
+        );
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -87,13 +112,27 @@ class list_of_channels extends StatelessWidget {
                       ),
                       Column(
                         children: <Widget>[
-                          Text(
-                            "time",
-                            style: TextStyle(
-                              color: Colors.blueGrey,
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          PopupMenuButton(itemBuilder: (context) {
+                            return [
+                              PopupMenuItem(
+                                value: 'edit',
+                                child: Text('Edit',style: TextStyle(fontWeight: FontWeight.bold),),
+                              ),
+                              PopupMenuItem(
+                                value: 'delete',
+                                child: Text('Delete', style: TextStyle(fontWeight: FontWeight.bold),),
+                              ),
+                            ];
+                          },
+                            onSelected: (String value){
+                              if(value=='edit'){
+                                print("edit value pressed");
+                              }
+                              else if(value=='delete')
+                              {
+                                _showDialog_for_confirm_delete_account(context);
+                              }
+                            },
                           ),
                           SizedBox(height: 5.0),
                           chats[k].unread

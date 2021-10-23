@@ -28,6 +28,7 @@ final USER aashish = USER(
   name: 'Aashish',
   imageUrl: 'assets/images/me.jpg.png',
 );
+
 final USER alan = USER(
   id: 2,
   name: 'Alan Tony',
