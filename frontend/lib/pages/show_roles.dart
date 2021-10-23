@@ -1,22 +1,21 @@
-import 'dart:ui';
-import 'package:chat_app_project/pages/create_new_group.dart';
-import 'package:chat_app_project/widgets/Category_selector.dart';
 import 'package:chat_app_project/widgets/Category_selector_for_groups.dart';
 import 'package:chat_app_project/widgets/Groups_chats.dart';
-import 'package:chat_app_project/widgets/messages_sent_recieved.dart';
-import 'package:chat_app_project/widgets/recent_chats_widget.dart';
+import 'package:chat_app_project/widgets/List_of_roles.dart';
+import 'package:chat_app_project/widgets/new_list_of_roles.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:flutter/services.dart';
 
-class Group_Page extends StatefulWidget {
-  Group_Page({Key? key}) : super(key: key);
+import 'create_new_group.dart';
+
+class show_roles extends StatefulWidget {
+  const show_roles({Key? key}) : super(key: key);
 
   @override
-  _Group_PageState createState() => _Group_PageState();
+  _show_rolesState createState() => _show_rolesState();
 }
 
-class _Group_PageState extends State<Group_Page> {
-
+class _show_rolesState extends State<show_roles> {
   void _showDialog_for_login_failure(BuildContext context,String message) {
     showDialog(
       context: context,
@@ -40,12 +39,19 @@ class _Group_PageState extends State<Group_Page> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => create_new_account()));
-        },
-        child: const Icon(Icons.add_circle_outline_sharp),
+      //floatingActionButton: FloatingActionButton(
+      //  onPressed: () {
+       //   Navigator.push(context,
+      //        MaterialPageRoute(builder: (context) => create_new_account()));
+      //  },
+      //  child: const Icon(Icons.add_circle_outline_sharp),
+      //),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.orange,
+        items: [BottomNavigationBarItem(icon: Icon(Icons.add_box_outlined), label: "ADD NEW ROLE"),
+          BottomNavigationBarItem(icon: Icon(Icons.arrow_back_ios_new_outlined), label: "RETURN"),
+        ],
+
       ),
       backgroundColor: Colors.red,
       appBar: AppBar(
@@ -58,7 +64,7 @@ class _Group_PageState extends State<Group_Page> {
           onPressed: () {},
         ),
         title: Text(
-          "Groups",
+          "HERMES Roles",
           style: TextStyle(
             color: Colors.white,
             fontSize: 30.0,
@@ -76,7 +82,6 @@ class _Group_PageState extends State<Group_Page> {
       ),
       body: Column(
         children: <Widget>[
-          CategorySelector_for_group(),
           Expanded(
             child: Container(
               decoration: BoxDecoration(
@@ -88,7 +93,7 @@ class _Group_PageState extends State<Group_Page> {
               child: Column(
                 children: <Widget>[
 
-                  Groups_chats(),
+                  new_list_of_roles(),
                 ],
               ),
             ),
