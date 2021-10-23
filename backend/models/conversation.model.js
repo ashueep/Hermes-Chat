@@ -34,6 +34,21 @@ const convoSchema = mongoose.Schema({
             chaName: String,
             permissions: [Number]
         }]
+    }],
+    events: [{
+        name: {
+            type: String,
+            required: true,
+        },
+        datetime: {
+            type: Date,
+        },
+        description: {
+            type: String,
+        },
+        attendees: [{
+            type: String,
+        }]
     }]
 });
 

@@ -23,11 +23,19 @@ app.use('/api/messages/', messages)
 const convo = require('./routes/convos')
 app.use('/api/conversations/', convo)
 
+const dm = require('./routes/dms')
+app.use('/api/dms/', dm)
+
 var https_options = {
     key: fs.readFileSync('./security/cert.key'),
     cert: fs.readFileSync('./security/cert.pem')
 };
 
 //app.listen(parseInt(process.env.PORT), () => console.log("Server Started"))
-const httpServer = http.createServer(app).listen(process.env.HTTP_PORT, () => console.log("HTTP Server Started"))
+const httpServer = http.createServer(app).listen(process.env.HTTP_PORT, () => console.log(`HTTP Server Started at http://localhost:${process.env.HTTP_PORT}/`))
 const httpsServer = https.createServer(https_options, app).listen(process.env.HTTPS_PORT, () => console.log("HTTPS Server Started"))
+
+module.exports = {
+    http: httpServer,
+    https: httpsServer
+}
