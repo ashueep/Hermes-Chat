@@ -17,6 +17,9 @@ app.use(express.json())
 const userRouter = require('./routes/userService')
 app.use('/api/userService/', userRouter)
 
+const events = require('./routes/events.js')
+app.use('/api/events/', events)
+
 const messages = require('./routes/messages.js')
 app.use('/api/messages/', messages)
 

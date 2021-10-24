@@ -27,7 +27,7 @@ const convoSchema = mongoose.Schema({
     roles: [{
         name: {
             type: String,
-            require: true,
+            required: true,
         },
         groupPermissions: [Number],
         channelPermissions: [{
