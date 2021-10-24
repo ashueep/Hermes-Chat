@@ -27,12 +27,27 @@ const convoSchema = mongoose.Schema({
     roles: [{
         name: {
             type: String,
-            require: true,
+            required: true,
         },
         groupPermissions: [Number],
         channelPermissions: [{
             chaName: String,
             permissions: [Number]
+        }]
+    }],
+    events: [{
+        name: {
+            type: String,
+            required: true,
+        },
+        datetime: {
+            type: Date,
+        },
+        description: {
+            type: String,
+        },
+        attendees: [{
+            type: String,
         }]
     }]
 });
