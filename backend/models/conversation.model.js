@@ -1,5 +1,14 @@
 const mongoose = require("mongoose")
 
+const memberSchema = mongoose.Schema({
+    memberID: {
+        type: mongoose.Types.ObjectId,
+        ref: 'User',
+        require: true,
+    },
+    roles: [String],
+})
+
 const convoSchema = mongoose.Schema({
     name: {
         type: String,
@@ -9,18 +18,12 @@ const convoSchema = mongoose.Schema({
         ref: 'User',
         require: true,
     },
-    members: [{
-        memberID: {
-            type: mongoose.Types.ObjectId,
-            ref: 'User',
-            require: true,
-        },
-        roles: [String],
-    }],
+    members: [memberSchema],
     channels: [{
         name: {
             type: String,
             required: true,
+            unique: true
         },
         messages: [{ type: mongoose.Types.ObjectId, ref: 'Message' }],
     }],
@@ -28,6 +31,7 @@ const convoSchema = mongoose.Schema({
         name: {
             type: String,
             required: true,
+            unique: true
         },
         groupPermissions: [Number],
         channelPermissions: [{
@@ -38,7 +42,7 @@ const convoSchema = mongoose.Schema({
     events: [{
         name: {
             type: String,
-            required: true,
+            required: true
         },
         datetime: {
             type: Date,

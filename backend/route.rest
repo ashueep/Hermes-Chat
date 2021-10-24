@@ -1,3 +1,6 @@
+
+//**********************************************Accounts**********************************
+
 GET https://localhost:3001/api/userService/getAccounts
 
 ###
@@ -33,12 +36,15 @@ Content-Type: application/json
 }
 
 ###
+
+//*********************************************Login/Logout********************************************
+
 //Login
 POST http://localhost:3000/api/userService/login
 Content-Type: application/json
 
 {
-    "email": "user1@python.com",
+    "email": "nab@asd.com",
     "password": "1234"
 }
 
@@ -48,13 +54,14 @@ POST http://localhost:3000/api/userService/logout
 Content-Type: application/json
 
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIxIiwiaWF0IjoxNjM0OTg3Mjc5LCJleHAiOjE2MzQ5OTQ0Nzl9.hFU4g5EdeqT0CuSM91zNJuQ7SovYruh1qHMCb8NDvGQ"
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ik5hYiIsImlhdCI6MTYzNTExMDgxNCwiZXhwIjoxNjM1MTE4MDE0fQ.zufkC6qitdzcxvP7hezPptx968D3cmNdj00HLsNSFb0"
 }
 
 ###
 
 //view messages in dm (initial GET request)
 GET http://localhost:3000/api/dms/6173f12261848616742b392a/view
+Content-Type: application/json
 
 {
     "token" :
@@ -62,10 +69,47 @@ GET http://localhost:3000/api/dms/6173f12261848616742b392a/view
 
 ###
 
-//create dm after querying username
-POST http://localhost:3000/api/dms/create
+//*******************************************DMs Section********************************************
+
+//Get all dms of a user
+GET http://localhost:3000/api/dms/getAll
+Content-Type: application/json
 
 {
-    "token" : "asd",
-    "username" : "Asd"
+    "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkJydWgxMjMiLCJpYXQiOjE2MzUwODUwNzMsImV4cCI6MTYzNTA5MjI3M30.yurp0gh6n9Pz7FvX67HL5_Z3G_bCEiFEzVST2X9_7K4"
+}
+
+###
+
+//create dm after querying username
+POST http://localhost:3000/api/dms/create
+Content-Type: application/json
+
+{
+    "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkJydWgxMjMiLCJpYXQiOjE2MzUwODUwNzMsImV4cCI6MTYzNTA5MjI3M30.yurp0gh6n9Pz7FvX67HL5_Z3G_bCEiFEzVST2X9_7K4",
+    "username" : "Nab"
+}
+
+###
+
+//********************************************Group Section******************************************
+
+//Create Group
+POST http://localhost:3000/api/conversations/create
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkJydWgxMjMiLCJpYXQiOjE2MzUwOTU5OTEsImV4cCI6MTYzNTEwMzE5MX0.ZMnrpO2K6UzqTg3RG6p6cWsAZ441MLea9tJXGiGAGDE",
+    "name": "CSE Discussions"
+}
+
+###
+//******************************************Roles section********************************************
+
+//Fetch all roles of a group
+GET http://localhost:3000/api/roles/61759709aa3f7bb7b31fa15d/getAll
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ik5hYiIsImlhdCI6MTYzNTExMTE3MywiZXhwIjoxNjM1MTE4MzczfQ.AoDgtirKg08gbpai7_yWE0feDPikjwCG9wMLtGLmNq4"
 }

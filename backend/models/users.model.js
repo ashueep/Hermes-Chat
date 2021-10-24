@@ -28,11 +28,11 @@ const userSchema = Schema({
     },
     groups: [{
         type: mongoose.Types.ObjectId,
-        ref: 'Conversation', 
+        ref: 'Conversation'
     }],
     dms: [{
         type: mongoose.Types.ObjectId,
-        ref: 'DM',
+        ref: 'DM'
     }]
 });
 
