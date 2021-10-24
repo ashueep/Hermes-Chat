@@ -1,6 +1,5 @@
 const express = require('express')
 const router = express.Router()
-const _ = require('underscore')
 const conversation = require('../models/conversation.model')
 const message = require('../models/message.model')
 const User = require('../models/users.model')
