@@ -23,7 +23,7 @@ const convoSchema = mongoose.Schema({
         name: {
             type: String,
             required: true,
-            unique: true
+            unique: true,
         },
         messages: [{ type: mongoose.Types.ObjectId, ref: 'Message' }],
     }],
@@ -31,7 +31,7 @@ const convoSchema = mongoose.Schema({
         name: {
             type: String,
             required: true,
-            unique: true
+            unique: true,
         },
         groupPermissions: [Number],
         channelPermissions: [{

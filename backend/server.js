@@ -20,6 +20,9 @@ app.use('/api/userService/', userRouter)
 const events = require('./routes/events')
 app.use('/api/events/', events)
 
+const channels = require('./routes/channels')
+app.use('/api/channels/', channels)
+
 const roles = require('./routes/roles')
 app.use('/api/roles/', roles)
 
@@ -56,8 +59,8 @@ const httpsServer = https.createServer(https_options, app).listen(process.env.HT
     console.log("HTTPS Server Started")
 })
 
-let io = require('socket.io')(httpServer)
-require('./socket.js')(io)
+// let io = require('socket.io')(httpServer)
+// require('./socket.js')(io)
 
 module.exports = {
     http: httpServer,
