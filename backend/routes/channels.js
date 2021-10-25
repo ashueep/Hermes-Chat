@@ -67,7 +67,7 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
                     else{
                         role['channelPermissions'].push({
                             chaName: req.body.chaName,
-                            permissions: [2]
+                            permissions: [1, 2]
                         })
                     }
                 }
