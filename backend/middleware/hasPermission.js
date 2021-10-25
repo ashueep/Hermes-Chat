@@ -35,7 +35,7 @@ function hasRolePermission(toCheck){
             if( userRoles == [] ) {
 
                 //console.log('denied here : 1')
-                return res.status(500).json({message: "Server error. No roles for user found", success: false})
+                return res.status(500).json({message: "Server rrror. No roles for user found", success: false})
             } else {
 
                 var perms = new Set()
@@ -48,10 +48,13 @@ function hasRolePermission(toCheck){
                             role['groupPermissions'].forEach(group_perm => perms.add(group_perm))                            
                         }
                         else if(toCheck.category == 'Channel'){
-                            const channel_perms = role['channelPermissions'].filter(function (channel) {
+                            var channel_perms = role['channelPermissions'].filter(function (channel) {
                                 return channel.chaName == req.body.chaName;
-                            })[0]['permissions']
+                            })
+                            channel_perms = channel_perms[0]['permissions']
+                            //console.log(channel_perms)
                             channel_perms.forEach(cperm => perms.add(cperm))
+                           // console.log(perms)
                         }
                         else{
 
@@ -64,11 +67,13 @@ function hasRolePermission(toCheck){
                 if( perms.has(toCheck.perm_number) == false ) {
 
                     //console.log('denied here : 2')
+                    console.log(perms, toCheck.perm_number)
                     return res.status(401).json({message: "Permission Denied.", success: false})
                 }
             }
             
         } catch(err){
+            console.log(err)
             return res.status(500).json({message: err.message, success: false})
         }
 
