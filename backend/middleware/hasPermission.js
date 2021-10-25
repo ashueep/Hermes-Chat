@@ -6,6 +6,12 @@ function hasRolePermission(toCheck){
     return async function (req, res, next){
 
         try {
+            if(toCheck.category == 'Channel'){
+                if(!res.group['channels'].some(x => x['name'] == req.body.chaName)){
+                    res.status(400).json({message: "channel does not exist", success: false});
+                    return;
+                }
+            }
 
             //Get roles with required permissions
             const req_user_id = res.user._id.toString();
@@ -29,7 +35,7 @@ function hasRolePermission(toCheck){
             if( userRoles == [] ) {
 
                 //console.log('denied here : 1')
-                res.status(500).json({message: "Server rrror. No roles for user found", success: false})
+                return res.status(500).json({message: "Server error. No roles for user found", success: false})
             } else {
 
                 var perms = new Set()
@@ -42,8 +48,9 @@ function hasRolePermission(toCheck){
                             role['groupPermissions'].forEach(group_perm => perms.add(group_perm))                            
                         }
                         else if(toCheck.category == 'Channel'){
-
-                            const channel_perms = role['channelPermissions'].filter({chaName: toCheck.chaName})
+                            const channel_perms = role['channelPermissions'].filter(function (channel) {
+                                return channel.chaName == req.body.chaName;
+                            })[0]['permissions']
                             channel_perms.forEach(cperm => perms.add(cperm))
                         }
                         else{
@@ -62,7 +69,6 @@ function hasRolePermission(toCheck){
             }
             
         } catch(err){
-
             return res.status(500).json({message: err.message, success: false})
         }
 

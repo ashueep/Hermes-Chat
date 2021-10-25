@@ -44,7 +44,7 @@ POST http://localhost:3000/api/userService/login
 Content-Type: application/json
 
 {
-    "email": "nab@asd.com",
+    "email": "alan.blah@python.com",
     "password": "1234"
 }
 
@@ -54,7 +54,7 @@ POST http://localhost:3000/api/userService/logout
 Content-Type: application/json
 
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ik5hYiIsImlhdCI6MTYzNTExMDgxNCwiZXhwIjoxNjM1MTE4MDE0fQ.zufkC6qitdzcxvP7hezPptx968D3cmNdj00HLsNSFb0"
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkJydWgxMjMiLCJpYXQiOjE2MzUxOTA2MDAsImV4cCI6MTYzNTE5NzgwMH0.B_8KsXIl6TmswGYZXlwb6eG1W94K-hMF6b1GKEGifGs"
 }
 
 ###
@@ -107,9 +107,44 @@ Content-Type: application/json
 //******************************************Roles section********************************************
 
 //Fetch all roles of a group
-GET http://localhost:3000/api/roles/61759709aa3f7bb7b31fa15d/getAll
+POST http://localhost:3000/api/roles/61759709aa3f7bb7b31fa15d/getAll
 Content-Type: application/json
 
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ik5hYiIsImlhdCI6MTYzNTExMTE3MywiZXhwIjoxNjM1MTE4MzczfQ.AoDgtirKg08gbpai7_yWE0feDPikjwCG9wMLtGLmNq4"
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkJydWgxMjMiLCJpYXQiOjE2MzUxOTA2MDAsImV4cCI6MTYzNTE5NzgwMH0.B_8KsXIl6TmswGYZXlwb6eG1W94K-hMF6b1GKEGifGs"
+}
+
+###
+
+//Create new role
+POST http://localhost:3000/api/roles/61759709aa3f7bb7b31fa15d/addRole
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkJydWgxMjMiLCJpYXQiOjE2MzUxOTA2MDAsImV4cCI6MTYzNTE5NzgwMH0.B_8KsXIl6TmswGYZXlwb6eG1W94K-hMF6b1GKEGifGs",
+    "name": "CR",
+    "groupPermissions": [1, 2, 3]
+}
+
+###
+
+//Delete role
+POST http://localhost:3000/api/roles/61759709aa3f7bb7b31fa15d/deleteRole
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkJydWgxMjMiLCJpYXQiOjE2MzUxOTA2MDAsImV4cCI6MTYzNTE5NzgwMH0.B_8KsXIl6TmswGYZXlwb6eG1W94K-hMF6b1GKEGifGs",
+    "name": "CR"
+}
+
+###
+
+//Edit role
+POST http://localhost:3000/api/roles/61759709aa3f7bb7b31fa15d/editRole
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkJydWgxMjMiLCJpYXQiOjE2MzUxOTA2MDAsImV4cCI6MTYzNTE5NzgwMH0.B_8KsXIl6TmswGYZXlwb6eG1W94K-hMF6b1GKEGifGs",
+    "name": "Everyone",
+    "groupPermissions":[1, 3]
 }

@@ -56,9 +56,6 @@ const httpsServer = https.createServer(https_options, app).listen(process.env.HT
     console.log("HTTPS Server Started")
 })
 
-let io = require('socket.io')(httpServer)
-require('./socket.js')(io)
-
 module.exports = {
     http: httpServer,
     https: httpsServer

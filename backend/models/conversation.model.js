@@ -35,7 +35,10 @@ const convoSchema = mongoose.Schema({
         },
         groupPermissions: [Number],
         channelPermissions: [{
-            chaName: String,
+            chaName: {
+                type: String,
+                unique: true
+            },
             permissions: [Number]
         }]
     }],
