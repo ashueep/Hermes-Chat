@@ -44,8 +44,8 @@ POST http://localhost:3000/api/userService/login
 Content-Type: application/json
 
 {
-    "email": "nab@asd.com",
-    "password": "1234"
+    "email": "user6@python.com",
+    "password": "12344"
 }
 
 ###
@@ -54,7 +54,7 @@ POST http://localhost:3000/api/userService/logout
 Content-Type: application/json
 
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ik5hYiIsImlhdCI6MTYzNTExMDgxNCwiZXhwIjoxNjM1MTE4MDE0fQ.zufkC6qitdzcxvP7hezPptx968D3cmNdj00HLsNSFb0"
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXI2IiwiaWF0IjoxNjM1MTY2NjMxLCJleHAiOjE2MzUxNzM4MzF9.2ETd2k837Bn6Ke1CvMdBRiOpNUkDAJVSpRtGjuK6D5Q"
 }
 
 ###
@@ -112,4 +112,18 @@ Content-Type: application/json
 
 {
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ik5hYiIsImlhdCI6MTYzNTExMTE3MywiZXhwIjoxNjM1MTE4MzczfQ.AoDgtirKg08gbpai7_yWE0feDPikjwCG9wMLtGLmNq4"
+}
+
+
+###
+POST http://localhost:3000/api/channels/61744c01d5b96aed245c834c/addChannels
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXI2IiwiaWF0IjoxNjM1MTY2ODI5LCJleHAiOjE2MzUxNzQwMjl9.coZIPXt_LMLEGOOBMxGPG3jQVTLEBvrnH_Rm5ydb7BQ",
+    "chaName": "elloha",
+    "view": ["hello"],
+    "write": ["hello", "world"],
+    "edit": ["hello"]
+
 }
