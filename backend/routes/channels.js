@@ -7,7 +7,7 @@ const message = require('../models/message.model')
 const User = require('../models/users.model')
 const hasPermission = require('../middleware/hasPermission')
 
-
+//TODO: 1. Remove check for non-existent channel name in channel permissions
 router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
     category: 'Group',
     perm_number: 1
@@ -38,8 +38,8 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
 
                 if(allroles.includes(role.name)){
                     if(role['channelPermissions'].some(arrVal => arrVal['chaName'] == req.body.chaName)){
-                        var index = role['channelPermissions'].findIndex(arrVal => arrVal['chaName'] == req.body.chaName)
-                        role['channelPermissions'][index]['permissions'].push(1);
+                        
+                        res.status(500).json({message: `Non-existent channel present in channel permissions of role ${role.name}`, success: false})
                     }
                     else{
                         role['channelPermissions'].push({
@@ -118,11 +118,11 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
             })
         }
 
-        const toSend = await res.group.save()
-        res.status(200).json(toSend)
+        await res.group.save()
+        res.status(200).json({message: `Channel ${req.body.chaName} created`, success: true})
 
     } catch(err) {
-        res.status(401).json(err);
+        res.status(401).json({message: err.message, success: false});
     }
 })
 
