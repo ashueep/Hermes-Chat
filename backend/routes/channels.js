@@ -1,10 +1,11 @@
 const express = require('express')
+const mongoose = require("mongoose")
 const isGroupMember = require('../middleware/isGroupMember')
 const auth = require('../middleware/auth')
 const router = express.Router()
 const conversation = require('../models/conversation.model')
-const message = require('../models/message.model')
-const User = require('../models/users.model')
+// const message = require('../models/message.model')
+// const User = require('../models/users.model')
 const hasPermission = require('../middleware/hasPermission')
 
 router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
@@ -262,6 +263,43 @@ router.post('/:id/deleteChannel', auth, isGroupMember, hasPermission({
     } catch (err) {
         console.log(err)
         res.status(500).json({message: err.message, success: false});
+    }
+})
+
+router.post("/:id/viewChannels", auth, isGroupMember, async(req, res) => {
+    try {
+        var userRoles = [];
+        var channels = [];
+        var memberx = await conversation.aggregate([{
+            $match: {'_id':  mongoose.Types.ObjectId(req.params.id)}
+        }, {
+            $unwind: "$members"
+        }, {
+            $match: {'members.memberID': mongoose.Types.ObjectId(res.user._id)}
+        }, {
+            $project: {
+                roles: "$members.roles" 
+            }
+        }])
+        // console.log(memberx)
+
+        userRoles = memberx[0]['roles'];
+        var temp_channels = []
+
+        res.group["roles"].forEach(role => {
+            if(userRoles.includes(role.name)){
+                temp_channels = temp_channels.concat(role["channelPermissions"].filter(x => x["permissions"].includes(1)))
+            }
+        })
+        channels = channels.concat(res.group.channels.filter(x => temp_channels.some(y => y['chaName'] == x["name"])))
+        // console.log(channels)
+
+        res.status(200).json({channels: channels, message: "Channels found and sent to user", success: true})
+
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({message: error.message, success: false});
     }
 })
 
