@@ -1,3 +1,12 @@
+Packages dependencies:
+1. bcryptjs
+2. dotenv
+3. express
+4. jsonwebtoken
+5. mongoose
+6. nodemon
+7. socket.io
+
 List of permissions:
 
 Group Permissions:
