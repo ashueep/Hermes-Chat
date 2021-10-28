@@ -7,16 +7,19 @@ const message = require('../models/message.model')
 const User = require('../models/users.model')
 const hasPermission = require('../middleware/hasPermission')
 
-//TODO: 1. Remove check for non-existent channel name in channel permissions
 router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
     category: 'Group',
     perm_number: 1
 }), async (req, res) => {
     try{
-        const user = res.user._id.toString();
 
+        if(!req.body.chaName){
+
+            return res.status(400).json({message: "Name of channel missing", success: false})
+        }
+        
         if(res.group['channels'].some(x => x['name'] == req.body.chaName)){
-            res.json({"message": "channel already exists"});
+            res.status(400).json({message: "channel already exists"});
             return;
         }
         
@@ -24,8 +27,6 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
             name: req.body.chaName,
             messages: [],
         })
-
-        var hp = {};
 
         if(req.body.view != null){
             console.log('in this1 statement')
@@ -89,7 +90,7 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
                     else{
                         role['channelPermissions'].push({
                             chaName: req.body.chaName,
-                            permissions: [3]
+                            permissions: [1, 3]
                         })
                     }
                 }
@@ -111,7 +112,7 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
                     else{
                         role['channelPermissions'].push({
                             chaName: req.body.chaName,
-                            permissions: [4]
+                            permissions: [1, 4]
                         })
                     }
                 }
@@ -126,12 +127,18 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
     }
 })
 
-
+//TODO: Ensure read privilege if write is set
 router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
     category: 'Channel',
     perm_number: 4
 }), async (req, res) => {
     try{
+
+        if(!req.body.chaName){
+
+            return res.status(400).json({message: "Name of channel missing", success: false})
+        }
+
         var index = res.group['channels'].findIndex(chan => chan['name'] == req.body.chaName);
         var oldname = res.group['channels'][index]['name'];
 
@@ -140,7 +147,20 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
             return;
         }
 
+        //Check if channel exists. If not return an error
+        if(res.group['channels'].some(x => x['name'] == req.body.chaName)){
+
+            return res.status(404).json({message: "Channel does not exist", success: false});;
+        }
+
         if(req.body.newName != null){
+
+            //Check if channel with same name already exists
+            if(res.group.channels.some(x => x['name'] == req.body.newname)){
+                
+                return res.status(400).json({message: "Role with the same name already exists", success: false})
+            }
+
             res.group['channels'][index]['name'] = req.body.newName;
             res.group['roles'].forEach(role => {
                 var ind = role['channelPermissions'].findIndex(val => val['chaName'] == oldname);
@@ -149,7 +169,8 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
                 }
             })
         }
-        var reqJSON = {"view": 1, "write": 2, "edit": 3, "delete": 4}
+        
+        const reqJSON = {"view": 1, "write": 2, "edit": 3, "delete": 4}
         if(req.body.view != null){
             var checkname;
             if(req.body.chaName != null) checkname = req.body.newName
@@ -198,39 +219,49 @@ router.post('/:id/deleteChannel', auth, isGroupMember, hasPermission({
     perm_number: 4
 }), async (req, res) => {
     try {
+
+        if(!req.body.chaName){
+
+            return res.status(400).json({message: "Name of channel missing", success: false})
+        }
+
         if(req.body.chaName == 'general'){
             res.status(400).json({message: "cannot delete general channel"})
             return;
         }
 
         var index = res.group['channels'].findIndex(chan => chan['name'] == req.body.chaName);
+        if(index == -1){
+
+            return res.status(404).json({message: "Channel does not exist", success: false});;
+        }
 
         var chanName = res.group['channels'][index]['name'];
         const query = {
             "_id": req.params.id
         }
 
+        //Remove channel from channel permissions of roles before removing the channel itself
         res.group['roles'].forEach(role => {
             if(role['channelPermissions'].some(arrVal => arrVal['chaName'] == chanName)){
                 role['channelPermissions'] = role['channelPermissions'].filter(x => x['chaName'] != chanName)
             }
         })
 
-        const groupSave = await res.group.save();
+        await res.group.save();
 
-        const deleteChannel = await conversation.findOneAndUpdate(
+        //Delete channel by name
+        await conversation.findOneAndUpdate(
             query,
             {'$pull': {"channels" : {"name": req.body.chaName}}},
             {safe: true}
         );
         
-        res.status(200).json({saved: groupSave, final: deleteChannel})
+        res.status(200).json({message: `Deleted channel ${req.body.chaName}`, success: false})
         
-
-
     } catch (err) {
         console.log(err)
-        res.json({message: err.message});
+        res.status(500).json({message: err.message, success: false});
     }
 })
 
@@ -239,6 +270,9 @@ function editChannel(allroles, role, perm, checkname){
         if(role['channelPermissions'].some(arrVal => arrVal['chaName'] == checkname)){
             var ind = role['channelPermissions'].findIndex(arrVal => arrVal['chaName'] == checkname)
             if(ind !== -1){
+                if (perm in [2, 3,4] && !role['channelPermissions'][ind]['permissions'].includes(1)){
+                    role['channelPermissions'][ind]['permissions'].push(1);
+                }
                 if (!role['channelPermissions'][ind]['permissions'].includes(perm)){
                     role['channelPermissions'][ind]['permissions'].push(perm);
                 }

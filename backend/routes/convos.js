@@ -80,60 +80,6 @@ router.post('/create/', auth, async (req, res) => {
     }
 })
 
-router.post('/:id/addrole/', async (req, res) => {
-    try{
-
-        const convo = await conversation.findOne({ _id : req.params.id });
-        const username = await User.findOne({ username : req.body.username });
-        const user = username._id;
-        
-        var userRoles = []
-        // 
-        for(const element of convo['members']){
-            console.log('id', element['memberID'])
-            if( element['memberID'].toString() == user._id.toString()){
-                console.log('in the if')
-                userRoles = element['roles']
-                break;
-            }
-        }
-        console.log('user:', userRoles)
-        if( userRoles == [] ) {
-            console.log('denied here : 1')
-            res.status(401).send("Permission Denied.")
-        } else {
-            var perms = []
-            userRoles.forEach(urole => {
-                convo['roles'].forEach(role => {
-                    if(urole == role['name']){ 
-                        console.log('hiii', role['groupPermissions'])
-                        perms = perms.concat(role['groupPermissions'])
-                    }
-                })
-            })
-            console.log('perms', perms)
-            if(  perms.includes(2) == false ) {
-                console.log('denied here : 2')
-                res.status(401).send("Permission Denied.")
-                return;
-            }
-        }
-        //
-
-        convo['roles'].push({
-            name: req.body.role,
-            groupPermissions: req.body.groupPermissions,
-            channelPermissions: req.body.channelPermissions
-        })
-
-        const toSend = await convo.save()
-        res.status(201).json(toSend)
-
-    } catch(err) {
-        res.status(201).json(err);
-    }
-})
-
 /* 
 {
     username: 

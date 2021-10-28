@@ -176,7 +176,7 @@ router.post('/:id/editRole', auth, isGroupMember, hasPermission({
             "roles._id": role._id
         }
         var eventJSON = {};
-        if(req.body.newname != null){
+        if(req.body.newname != null && req.body.newname != req.body.name){
 
             //Check if role with same name already exists
             if(res.group.roles.some(x => x['name'] == req.body.newname)){
