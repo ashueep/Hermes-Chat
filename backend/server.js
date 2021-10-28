@@ -3,7 +3,11 @@ require('dotenv').config()
 const express = require('express')
 const app = express()
 const mongoose  = require('mongoose')
-const http = require('http')
+const http = require('http').createServer(app)
+const io = require('socket.io')(http, { cors : { origin : "*" } });
+const message = require('./models/message.model');
+const DM = require('./models/dm.model')
+const user = require('./models/users.model');
 const https = require('https')
 const fs = require('fs')
 
@@ -31,8 +35,55 @@ var https_options = {
     cert: fs.readFileSync('./security/cert.pem')
 };
 
+const insert = async (sender, body, room, timestamp) => {
+    const dm = await DM.findById(room);
+    const senderID = await user.findOne({ username : sender })
+    const newmess = new message({
+        senderID: senderID,
+        body: body,
+        timeStamp: timestamp,
+    })
+
+    const mess = await newmess.save();
+    dm['messages'].push(mess._id)
+    await dm.save()
+}
+
+try {
+    io.on('connection', socket => {
+        console.log('connected socket', socket.id)
+        socket.on('connectDM', (dmid) => {
+            socket.join(dmid['dmid']);
+            console.log('connectDM', dmid)
+        })
+        socket.on('sendDM', message => {
+            console.log("hello")
+            room = message.room
+            sender = message.sender
+            text = message.text
+            console.log(room)
+            const time = Date.now()
+
+            insert(sender, text, room, time)
+
+            socket.to(room).emit('recvDM', {
+                senderID: sender,
+                body: text,
+                timestamp: time
+            })
+
+        })
+        socket.on('disconnect', () => {
+            socket.leave(chatID);
+        })
+    })
+} catch (err) {
+    console.log(err)
+}
+
 //app.listen(parseInt(process.env.PORT), () => console.log("Server Started"))
-const httpServer = http.createServer(app).listen(process.env.HTTP_PORT, () => console.log(`HTTP Server Started at http://localhost:${process.env.HTTP_PORT}/`))
+const httpServer = http.listen(process.env.HTTP_PORT, () => 
+    console.log(`HTTP Server Started at http://localhost:${process.env.HTTP_PORT}/`))
 const httpsServer = https.createServer(https_options, app).listen(process.env.HTTPS_PORT, () => console.log("HTTPS Server Started"))
 
 module.exports = {

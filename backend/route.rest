@@ -38,8 +38,8 @@ POST http://localhost:3000/api/userService/login
 Content-Type: application/json
 
 {
-    "email": "user1@python.com",
-    "password": "1234"
+    "email": "user6@python.com",
+    "password": "12344"
 }
 
 ###
@@ -54,18 +54,31 @@ Content-Type: application/json
 ###
 
 //view messages in dm (initial GET request)
-GET http://localhost:3000/api/dms/6173f12261848616742b392a/view
+POST http://localhost:3000/api/dms/61757464b02926a3f080ee61/view
+Content-Type: application/json
 
 {
-    "token" :
+    "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFsYW4iLCJpYXQiOjE2MzUxMDAzNDEsImV4cCI6MTYzNTEwNzU0MX0.MhBIJkzUanoU1NFIxcWpky_N1HR6TvDeBu4A-voUtA0"
 }
 
 ###
 
 //create dm after querying username
 POST http://localhost:3000/api/dms/create
+Content-Type: application/json
 
 {
-    "token" : "asd",
-    "username" : "Asd"
+    "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFsYW4iLCJpYXQiOjE2MzUwNjg3NTcsImV4cCI6MTYzNTA3NTk1N30.rlGQ7KFTe9XUW6DkcjpWtIrGLKeQ0dA4TCBY452ZKzE",
+    "username" : "akkka"
 }
+
+###
+
+POST http://localhost:3000/api/dms/viewDM
+Content-Type: application/json
+
+{
+    "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFsYW4iLCJpYXQiOjE2MzUwODcyNTgsImV4cCI6MTYzNTA5NDQ1OH0.626bctB1-YE4grAynndhbE9cAZbWT6xIKejIRH4hiDE"
+}
+
+
