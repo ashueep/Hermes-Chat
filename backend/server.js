@@ -21,6 +21,15 @@ app.use(express.json())
 const userRouter = require('./routes/userService')
 app.use('/api/userService/', userRouter)
 
+const events = require('./routes/events')
+app.use('/api/events/', events)
+
+const channels = require('./routes/channels')
+app.use('/api/channels/', channels)
+
+const roles = require('./routes/roles')
+app.use('/api/roles/', roles)
+
 const messages = require('./routes/messages.js')
 app.use('/api/messages/', messages)
 
@@ -82,9 +91,23 @@ try {
 }
 
 //app.listen(parseInt(process.env.PORT), () => console.log("Server Started"))
-const httpServer = http.listen(process.env.HTTP_PORT, () => 
-    console.log(`HTTP Server Started at http://localhost:${process.env.HTTP_PORT}/`))
-const httpsServer = https.createServer(https_options, app).listen(process.env.HTTPS_PORT, () => console.log("HTTPS Server Started"))
+const httpServer = http.listen(process.env.HTTP_PORT, (err) => {
+    
+    if(err){
+        console.log(err.message)
+        return
+    }
+    console.log(`HTTP Server Started at http://localhost:${process.env.HTTP_PORT}/`)
+})
+
+const httpsServer = https.createServer(https_options, app).listen(process.env.HTTPS_PORT, (err) => {
+    
+    if(err){
+        console.log(err.message)
+        return
+    }
+    console.log("HTTPS Server Started")
+})
 
 module.exports = {
     http: httpServer,
