@@ -182,3 +182,11 @@ Content-Type: application/json
 {
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXI2IiwiaWF0IjoxNjM1MTg3MTAxLCJleHAiOjE2MzUxOTQzMDF9.0cAcdEhbsh1vPtdPog0RhdNAycSVGKNaKBm_ehOKW-o"
 }
+
+###
+POST http://localhost:3000/api/channels/61744c01d5b96aed245c834c/viewChannels
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXI2IiwiaWF0IjoxNjM1MjI2NTY5LCJleHAiOjE2MzUyMzM3Njl9.9q5m1w0oDexdIESfiZEaUOAgOzxMdYKadUwH0JRKzQs"
+}
