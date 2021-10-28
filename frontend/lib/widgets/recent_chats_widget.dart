@@ -1,3 +1,4 @@
+import 'package:chat_app_project/models/dm_model.dart';
 import 'package:chat_app_project/models/message_model.dart';
 import 'package:chat_app_project/pages/chat_window.dart';
 import 'package:flutter/cupertino.dart';
@@ -39,14 +40,14 @@ class recent_chats extends StatelessWidget {
             child: ListView.builder(
               padding: EdgeInsets.only(left: 10.0),
               scrollDirection: Axis.horizontal,
-              itemCount: 5,
+              itemCount: list_of_DMs.length,
               itemBuilder: (BuildContext context, int j) {
                 return GestureDetector(
                   onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (_) =>
-                              Chat_Window(person1: recents[j]))),
+                              Chat_Window(iter: j,full_name: list_of_DMs[j].friend.full_name,))),
                   child: Padding(
                     padding: EdgeInsets.all(10.0),
                     child: Column(
@@ -57,7 +58,7 @@ class recent_chats extends StatelessWidget {
                         ),
                         SizedBox(height: 6.0),
                         Text(
-                          recents[j].name,
+                          list_of_DMs[j].friend.full_name,
                           style: TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeight.bold,

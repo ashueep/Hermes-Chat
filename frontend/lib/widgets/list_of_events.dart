@@ -1,30 +1,24 @@
 import 'package:chat_app_project/models/Groups.dart';
-import 'package:chat_app_project/models/Sending_login_credentials_to_API.dart';
-import 'package:chat_app_project/models/message_model.dart';
 import 'package:chat_app_project/pages/Groups_Page.dart';
-import 'package:chat_app_project/pages/chat_window.dart';
+import 'package:chat_app_project/pages/change_event_details.dart';
+import 'package:chat_app_project/pages/change_role_name_page.dart';
+import 'package:chat_app_project/pages/edit_event_members.dart';
 import 'package:chat_app_project/pages/edit_roles_and_permissions.dart';
-import 'package:chat_app_project/pages/group_channels.dart';
+import 'package:chat_app_project/pages/event_members_display.dart';
+import 'package:chat_app_project/pages/show_roles.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:math';
 
-class permission_for_a_particular_role extends StatefulWidget {
+class list_pf_events extends StatefulWidget {
+  const list_pf_events({Key? key}) : super(key: key);
+
   @override
-  State<permission_for_a_particular_role> createState() => _permission_for_a_particular_roleState();
+  _list_pf_eventsState createState() => _list_pf_eventsState();
 }
 
-class _permission_for_a_particular_roleState extends State<permission_for_a_particular_role> {
-  @override
-  List<String> roles=["Teacher","Student","Principal","Administrator"];
-
-  List<String> permissions=["Edit Group Name","Delete Group","Add channels","add/modify/delete roles","add/remove members","Add/edit/delete events"];
-
-  List<bool> value1=[false,false,false,false,false,false];
-
-  bool value=false;
-
+class _list_pf_eventsState extends State<list_pf_events> {
+  List<String> events=["Front end design progress week 3","College fest discussion","engineer tech fest"];
   List<Color> colors=[Colors.lightBlue,Colors.lightBlueAccent,Colors.lightGreen,Colors.lightGreenAccent,Colors.lime,Colors.limeAccent];
-
   @override
 
   Widget _buildNewRoleBtn() {
@@ -55,13 +49,13 @@ class _permission_for_a_particular_roleState extends State<permission_for_a_part
     );
   }
 
-  void _showDialog_for_confirm_delete_account(BuildContext context,String role) {
+  void _showDialog_for_confirm_delete_event(BuildContext context,String event) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: new Text("Alert!"),
-          content: new Text("Are you sure you want to delete the role $role?"),
+          content: new Text("Are you sure you want to delete the event $event?"),
           actions: <Widget>[
             new FlatButton(
               child: new Text("CANCEL"),
@@ -71,7 +65,7 @@ class _permission_for_a_particular_roleState extends State<permission_for_a_part
             ),
             new FlatButton(
                 onPressed: () {Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Group_Page()));},
+                    MaterialPageRoute(builder: (context) => show_roles()));},
                 child: new Text("YES"))
           ],
         );
@@ -96,7 +90,7 @@ class _permission_for_a_particular_roleState extends State<permission_for_a_part
             topRight: Radius.circular(28.0),
           ),
           child: ListView.builder(
-            itemCount: permissions.length,
+            itemCount: events.length,
             itemBuilder: (BuildContext context, int k) {
               return GestureDetector(
                 onTap: () {print("role pressed");},
@@ -126,7 +120,20 @@ class _permission_for_a_particular_roleState extends State<permission_for_a_part
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.50,
                                 child: Text(
-                                  permissions[k],
+                                  events[k] ,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.w300,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.50,
+                                child: Text(
+                                  "Event Description: " + events[k],
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 20.0,
@@ -141,13 +148,41 @@ class _permission_for_a_particular_roleState extends State<permission_for_a_part
                       ),
                       Column(
                         children: <Widget>[
-                          Checkbox(value: value1[k],
-                            onChanged: (value) {
-                              setState(() {
-                                value1[k] = value!;
-                              });
+                          PopupMenuButton(itemBuilder: (context) {
+                            return [
+                              PopupMenuItem(
+                                value: 'edit event name',
+                                child: Text('Edit Event Details',style: TextStyle(fontWeight: FontWeight.bold),),
+                              ),
+                              PopupMenuItem(
+                                value: 'edit event members',
+                                child: Text('Edit Event Members',style: TextStyle(fontWeight: FontWeight.bold),),
+                              ),
+                              PopupMenuItem(
+                                value: 'delete event',
+                                child: Text('Delete Event', style: TextStyle(fontWeight: FontWeight.bold),),
+                              ),
+                            ];
+                          },
+                            onSelected: (String value){
+                              if(value=='edit event members'){
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) => event_members_page_edit_event_members()));
+                              }
+
+                              else if(value=='edit event name')
+                              {
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) => change_event_details()));
+                              }
+
+                              else if(value=='delete event')
+                              {
+                                _showDialog_for_confirm_delete_event(context, groups[k].Group_name);
+                              }
                             },
                           ),
+
                           SizedBox(height: 2.5),
 
                         ],

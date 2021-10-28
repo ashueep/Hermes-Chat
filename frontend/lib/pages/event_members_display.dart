@@ -1,16 +1,16 @@
-import 'package:chat_app_project/widgets/list_of_events.dart';
-import 'package:chat_app_project/widgets/new_list_of_roles.dart';
+import 'package:chat_app_project/pages/edit_event_members.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class show_events extends StatefulWidget {
-  const show_events({Key? key}) : super(key: key);
+class event_members_page_edit_event_members extends StatefulWidget {
+  const event_members_page_edit_event_members({Key? key}) : super(key: key);
 
   @override
-  _show_eventsState createState() => _show_eventsState();
+  _event_members_page_edit_event_membersState createState() => _event_members_page_edit_event_membersState();
 }
 
-class _show_eventsState extends State<show_events> {
+class _event_members_page_edit_event_membersState extends State<event_members_page_edit_event_members> {
+  int curr_index=0;
   void _showDialog_for_login_failure(BuildContext context,String message) {
     showDialog(
       context: context,
@@ -33,6 +33,14 @@ class _show_eventsState extends State<show_events> {
 
   @override
   Widget build(BuildContext context) {
+
+    void onTabTapped(int index) {
+      if(index==0)
+      {
+
+      }
+    }
+
     return Scaffold(
       //floatingActionButton: FloatingActionButton(
       //  onPressed: () {
@@ -43,7 +51,9 @@ class _show_eventsState extends State<show_events> {
       //),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.orange,
-        items: [BottomNavigationBarItem(icon: Icon(Icons.add_box_outlined), label: "ADD NEW ROLE"),
+        onTap: onTabTapped,
+        currentIndex: curr_index,
+        items: [BottomNavigationBarItem(icon: Icon(Icons.add_box_outlined), label: "CONFIRM CHANGES"),
           BottomNavigationBarItem(icon: Icon(Icons.arrow_back_ios_new_outlined), label: "RETURN"),
         ],
 
@@ -59,7 +69,7 @@ class _show_eventsState extends State<show_events> {
           onPressed: () {},
         ),
         title: Text(
-          "HERMES Events",
+          "Event Members",
           style: TextStyle(
             color: Colors.white,
             fontSize: 30.0,
@@ -88,7 +98,8 @@ class _show_eventsState extends State<show_events> {
               child: Column(
                 children: <Widget>[
 
-                  list_pf_events(),
+                  edit_event_members(),
+
                 ],
               ),
             ),
