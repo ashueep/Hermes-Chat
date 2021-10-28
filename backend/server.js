@@ -3,7 +3,7 @@ require('dotenv').config()
 const express = require('express')
 const app = express()
 const mongoose  = require('mongoose')
-const http = require('http')
+const http = require('http').createServer(app)
 const io = require('socket.io')(http, { cors : { origin : "*" } });
 const message = require('./models/message.model');
 const DM = require('./models/dm.model')
@@ -91,7 +91,7 @@ try {
 }
 
 //app.listen(parseInt(process.env.PORT), () => console.log("Server Started"))
-const httpServer = http.createServer(app).listen(process.env.HTTP_PORT, (err) => {
+const httpServer = http.listen(process.env.HTTP_PORT, (err) => {
     
     if(err){
         console.log(err.message)

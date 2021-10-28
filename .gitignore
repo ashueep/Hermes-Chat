@@ -1,4 +1,6 @@
 backend/node_modules
 backend/.env
 debug.log
-package-lock.json
+backend/package-lock.json
+backend/package.json
+backend/route.rest
