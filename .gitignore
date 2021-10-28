@@ -2,5 +2,5 @@ backend/node_modules
 backend/.env
 debug.log
 backend/package-lock.json
-backend/route.rest
 backend/package.json
+backend/route.rest
