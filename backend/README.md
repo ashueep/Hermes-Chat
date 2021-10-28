@@ -10,7 +10,7 @@ Group Permissions:
 
 Channel Permissions:
 
-1: view messages
-2: send message
+1: view
+2: write
 3: edit (includes channel name and channel permissions)
 4: delete channel (Nobody should have the permission to delete general channel)
