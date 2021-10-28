@@ -137,11 +137,11 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
 
         if(!req.body.chaName){
 
-            return res.status(400).json({message: "Name of channel missing", success: false})
+            return res.status(400).json({message: "Original name of channel missing", success: false})
         }
 
         var index = res.group['channels'].findIndex(chan => chan['name'] == req.body.chaName);
-        var oldname = res.group['channels'][index]['name'];
+        var oldname = req.body.chaName;
 
         if(req.body.chaName == 'general'){
             res.status(400).json({message: "cannot modify general channel"})
@@ -149,7 +149,7 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
         }
 
         //Check if channel exists. If not return an error
-        if(res.group['channels'].some(x => x['name'] == req.body.chaName)){
+        if(!res.group['channels'].some(x => x['name'] == req.body.chaName)){
 
             return res.status(404).json({message: "Channel does not exist", success: false});;
         }
@@ -157,9 +157,9 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
         if(req.body.newName != null){
 
             //Check if channel with same name already exists
-            if(res.group.channels.some(x => x['name'] == req.body.newname)){
+            if(res.group.channels.some(x => x['name'] == req.body.newName)){
                 
-                return res.status(400).json({message: "Role with the same name already exists", success: false})
+                return res.status(400).json({message: "Channel with the same name already exists", success: false})
             }
 
             res.group['channels'][index]['name'] = req.body.newName;
@@ -174,7 +174,7 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
         const reqJSON = {"view": 1, "write": 2, "edit": 3, "delete": 4}
         if(req.body.view != null){
             var checkname;
-            if(req.body.chaName != null) checkname = req.body.newName
+            if(req.body.newName != null) checkname = req.body.newName
             else checkname = oldname;
             var allroles = req.body.view;
             res.group['roles'].forEach(role => {
@@ -183,7 +183,7 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
         }
         if(req.body.write != null){
             var checkname;
-            if(req.body.chaName != null) checkname = req.body.newName
+            if(req.body.newName != null) checkname = req.body.newName
             else checkname = oldname;
             var allroles = req.body.write;
             res.group['roles'].forEach(role => {
@@ -192,7 +192,7 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
         }
         if(req.body.edit != null){
             var checkname;
-            if(req.body.chaName != null) checkname = req.body.newName
+            if(req.body.newName != null) checkname = req.body.newName
             else checkname = oldname;
             var allroles = req.body.edit;
             res.group['roles'].forEach(role => {
@@ -201,7 +201,7 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
         }
         if(req.body.delete != null){
             var checkname;
-            if(req.body.chaName != null) checkname = req.body.newName
+            if(req.body.newName != null) checkname = req.body.newName
             else checkname = oldname;
             var allroles = req.body.delete;
             res.group['roles'].forEach(role => {
@@ -305,6 +305,12 @@ router.post("/:id/viewChannels", auth, isGroupMember, async(req, res) => {
 
 function editChannel(allroles, role, perm, checkname){
     if(allroles.includes(role.name)){
+        if(!role['channelPermissions'].some(arrVal => arrVal['chaName'] == checkname)){
+            role['channelPermissions'].push({
+                chaName: checkname,
+                permissions: []
+            })
+        }
         if(role['channelPermissions'].some(arrVal => arrVal['chaName'] == checkname)){
             var ind = role['channelPermissions'].findIndex(arrVal => arrVal['chaName'] == checkname)
             if(ind !== -1){
@@ -315,7 +321,7 @@ function editChannel(allroles, role, perm, checkname){
                     role['channelPermissions'][ind]['permissions'].push(perm);
                 }
             }
-        }
+        } 
     }
     else{
         if(role['channelPermissions'].some(arrVal => arrVal['chaName'] == checkname)){
