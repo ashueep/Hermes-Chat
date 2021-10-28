@@ -141,7 +141,7 @@ router.post('/login', async (req, res) => {
         const user = await User.findOne({email: req.body.email})
         if(!user){
 
-            return res.status(404).json({message: "User with given email not found. Please create an account", logstatus: false})
+            return res.status(404).json({message: "User with given email not found. Please create an account", logstatus: false,})
         }
         res.user = user
 
@@ -181,7 +181,7 @@ router.post('/login', async (req, res) => {
                         }
                         //file written successfully
                     })
-                    res.status(200).json({message: "Login successful", logstatus: res.user.logstatus, token: token}) //Status 200: OK
+                    res.status(200).json({message: "Login successful", logstatus: res.user.logstatus, token: token,username: res.user.username}) //Status 200: OK
                 }
             })
         }
