@@ -27,27 +27,38 @@ Future<List<String>> sendData(String username, String password) async {
     {
       return ["Server Failure","false"];
     }
-  else {
+  else if(returned_login_result.statusCode==200 || returned_login_result.statusCode==201){
     temp_message = decoded_login_data['message'];
     new_login_status = decoded_login_data['logstatus'];
-    (new_login_status == true) ? logstatus_in_form_of_string = "true" : logstatus_in_form_of_string = "false";
+    username_of_current_user=decoded_login_data['username'];
+    print("");
+    print(username_of_current_user);
+    print("");
+    (new_login_status == true && login_status==false) ? logstatus_in_form_of_string = "true" : logstatus_in_form_of_string = "false";
     print(logstatus_in_form_of_string);
     if(new_login_status==true && login_status==false)
       {
         jwt_token = decoded_login_data['token'];
+        login_status=true;
       }
-    login_status=new_login_status;
     print(jwt_token);
     print(new_login_status);
     print("current global logstatus is: ");
     print(login_status);
     print(logstatus_in_form_of_string);
 
-
-
     response_to_be_returned.add(temp_message);
     response_to_be_returned.add(logstatus_in_form_of_string);
+    print(response_to_be_returned[0]);
 
     return response_to_be_returned;
   }
+  else
+    {
+      temp_message = decoded_login_data['message'];
+      logstatus_in_form_of_string="false";
+      response_to_be_returned.add(temp_message);
+      response_to_be_returned.add(logstatus_in_form_of_string);
+      return response_to_be_returned;
+    }
 }

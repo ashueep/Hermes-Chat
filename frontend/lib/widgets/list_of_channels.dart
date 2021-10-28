@@ -1,5 +1,6 @@
 import 'package:chat_app_project/models/Groups.dart';
 import 'package:chat_app_project/models/channels.dart';
+import 'package:chat_app_project/models/dm_model.dart';
 import 'package:chat_app_project/models/message_model.dart';
 import 'package:chat_app_project/pages/Groups_Page.dart';
 import 'package:chat_app_project/pages/chat_window.dart';
@@ -56,7 +57,7 @@ class list_of_channels extends StatelessWidget {
                      Navigator.push(
                      context,
                      MaterialPageRoute(
-                         builder: (_) => Chat_Window(person1: chats[k].sender))),
+                         builder: (_) => Chat_Window(iter: k,full_name: list_of_DMs[k].friend.full_name,))),
                 child: Container(
                   margin: EdgeInsets.only(
                     top: 5.0,
