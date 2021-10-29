@@ -292,6 +292,7 @@ router.post("/:id/viewChannels", auth, isGroupMember, async(req, res) => {
             }
         })
         channels = channels.concat(res.group.channels.filter(x => temp_channels.some(y => y['chaName'] == x["name"])))
+        channels = channels.map(channel => {return {"_id": channel._id, "chanName": channel.name}})
         // console.log(channels)
 
         res.status(200).json({channels: channels, message: "Channels found and sent to user", success: true})
