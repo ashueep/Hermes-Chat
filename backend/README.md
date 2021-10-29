@@ -9,7 +9,7 @@
 
 # List of permissions:
 
-# Group Permissions:
+## Group Permissions:
 
 1. add channels (this will imply that the role creating the channel will have channel edit and delete permissions by default)
 2. add/modify/delete roles
@@ -17,7 +17,7 @@
 4. Add/edit/delete events
 5. Delete group (Admin only)
 
-# Channel Permissions:
+## Channel Permissions:
 
 1. view
 2. write
