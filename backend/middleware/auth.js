@@ -23,7 +23,7 @@ const verifyToken = async (req, res, next) => {
     try{
          
         let user = await User.findOne({username: req.user.username})
-        console.log(req.user.username, "\n", user)
+        //console.log(req.user.username, "\n", user)
         if(!user){
 
             return res.status(404).json({message: "No user with given email found"})    //Status 401: Not Found

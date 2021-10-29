@@ -37,6 +37,22 @@ router.get('/allgroups/', async (req, res) => {
     }
 })
 
+router.post('/getGroups/', auth, async (req, res) => {
+
+    try {
+
+        await res.user.populate({
+            path: 'groups',
+            model: 'Conversation',
+            select: {'name': 1}
+        });
+        res.status(200).json({message: "Groups found", groups: res.user.groups, success: true})
+    } catch (err){
+
+        res.status({message: err.message, success: false})
+    }
+})
+
 router.post('/create/', auth, async (req, res) => {
     try {
         const creator = res.user
