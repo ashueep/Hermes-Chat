@@ -1,4 +1,4 @@
-Packages dependencies:
+# Packages dependencies:
 1. bcryptjs
 2. dotenv
 3. express
@@ -7,9 +7,9 @@ Packages dependencies:
 6. nodemon
 7. socket.io
 
-List of permissions:
+# List of permissions:
 
-Group Permissions:
+## Group Permissions:
 
 1. add channels
 2. add/modify/delete roles, add/remove members from roles
@@ -17,7 +17,7 @@ Group Permissions:
 4. Add/edit/delete events
 5. Edit/Delete group (Admin only)
 
-Channel Permissions:
+## Channel Permissions:
 
 1. view
 2. write
