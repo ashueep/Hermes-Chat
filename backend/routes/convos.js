@@ -97,6 +97,7 @@ router.post('/:id/getGroup/', auth, isGroupMember, async (req, res) => {
 
         //Get channels to whuich user has view permission
         let channelSet = new Set()
+        let user_roles = []
         for(let user_role of member.roles) {
 
             //Find role in roles array
@@ -105,6 +106,7 @@ router.post('/:id/getGroup/', auth, isGroupMember, async (req, res) => {
 
                 return res.status(404).json({message: `User role "${user_role}" not found in group`, success: false})
             }
+            user_roles.push(found_role)
 
             if(found_role.channelPermissions){
 
@@ -120,13 +122,10 @@ router.post('/:id/getGroup/', auth, isGroupMember, async (req, res) => {
 
                         channelSet.add(chaPerm.chaName)
 
-                        //Populate messages before adding to channel set
-                        await res.group.populate({
-                            path: `channels.${channel_index}.messages`,
-                            models: 'Message'
+                        group.channels.push({
+                            _id: res.group.channels[channel_index]._id, 
+                            chaName: res.group.channels[channel_index].name
                         })
-
-                        group.channels.push(res.group.channels[channel_index])
                     }
                 
                 }
@@ -134,7 +133,11 @@ router.post('/:id/getGroup/', auth, isGroupMember, async (req, res) => {
         }
         
         //Return group details
-        res.status(200).json({message: `Fetched group "${group.name}"`, group: group.channels, success: true})
+        res.status(200).json({
+            message: `Fetched group "${group.name}"`, 
+            group_name : res.group.name,
+            user_roles: user_roles, channels: group.channels, success: true
+        })
         
     } catch(err){
 

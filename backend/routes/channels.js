@@ -124,7 +124,7 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
         res.status(200).json({message: `Channel ${req.body.chaName} created`, success: true})
 
     } catch(err) {
-        res.status(401).json({message: err.message, success: false});
+        res.status(500).json({message: err.message, success: false});
     }
 })
 
@@ -207,10 +207,13 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
                 role = editChannel(allroles, role, reqJSON.delete, checkname);
             })
         }
-        const toSend = await res.group.save()
-        res.status(200).json(toSend)
+        
+        await res.group.save()
+        res.status(200).json({message: "Edited channel", success: true})
+        
     } catch(err) {
-        res.json({"message": err.message});
+
+        res.status(500).json({message: err.message, success: false});
     }
 })
 
@@ -265,10 +268,8 @@ router.post('/:id/deleteChannel', auth, isGroupMember, hasPermission({
     }
 })
 
-router.post("/:id/viewChannels", auth, isGroupMember, async(req, res) => {
+router.post("/:id/viewAll", auth, isGroupMember, async(req, res) => {
     try {
-        var userRoles = [];
-        var channels = [];
         var memberx = await conversation.aggregate([{
             $match: {'_id':  mongoose.Types.ObjectId(req.params.id)}
         }, {
@@ -280,27 +281,29 @@ router.post("/:id/viewChannels", auth, isGroupMember, async(req, res) => {
                 roles: "$members.roles" 
             }
         }])
-        // console.log(memberx)
 
-        userRoles = memberx[0]['roles'];
-        var temp_channels = []
+        const user_roles = res.group.roles.filter(some_role => memberx[0].roles.includes(some_role.name) )
 
-        //res.group.populate()
-        res.group["roles"].forEach(role => {
-            if(userRoles.includes(role.name)){
-                temp_channels = temp_channels.concat(role["channelPermissions"].filter(x => x["permissions"].includes(1)))
+        let channels = []
+        res.group.channels.forEach((some_channel) => {
+            if(user_roles.some(some_user_role =>{
+
+                let chaPerm = some_user_role.channelPermissions.find(some_user_role_chaPerm => 
+                    some_user_role_chaPerm.chaName == some_channel.name)
+
+                return chaPerm && chaPerm.permissions.includes(1)
+            })){
+
+                channels.push({_id: some_channel._id, name: some_channel.name})
             }
         })
-        channels = channels.concat(res.group.channels.filter(x => temp_channels.some(y => y['chaName'] == x["name"])))
-        channels = channels.map(channel => {return {"_id": channel._id, "chaName": channel.name}})
-        // console.log(channels)
 
-        res.status(200).json({channels: channels, message: "Channels found and sent to user", success: true})
+        res.status(200).json({message: "Channels found and sent to user", channels: channels, user_roles: user_roles, success: true})
 
 
     } catch (error) {
         console.log(error)
-        res.status(400).json({message: error.message, success: false});
+        res.status(500).json({message: error.message, success: false});
     }
 })
 
