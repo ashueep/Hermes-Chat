@@ -128,7 +128,6 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
     }
 })
 
-//TODO: Ensure read privilege if write is set
 router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
     category: 'Channel',
     perm_number: 4
@@ -237,15 +236,15 @@ router.post('/:id/deleteChannel', auth, isGroupMember, hasPermission({
             return res.status(404).json({message: "Channel does not exist", success: false});;
         }
 
-        var chanName = res.group['channels'][index]['name'];
+        var chaName = res.group['channels'][index]['name'];
         const query = {
             "_id": req.params.id
         }
 
         //Remove channel from channel permissions of roles before removing the channel itself
         res.group['roles'].forEach(role => {
-            if(role['channelPermissions'].some(arrVal => arrVal['chaName'] == chanName)){
-                role['channelPermissions'] = role['channelPermissions'].filter(x => x['chaName'] != chanName)
+            if(role['channelPermissions'].some(arrVal => arrVal['chaName'] == chnName)){
+                role['channelPermissions'] = role['channelPermissions'].filter(x => x['chaName'] != chaName)
             }
         })
 
@@ -286,13 +285,14 @@ router.post("/:id/viewChannels", auth, isGroupMember, async(req, res) => {
         userRoles = memberx[0]['roles'];
         var temp_channels = []
 
+        //res.group.populate()
         res.group["roles"].forEach(role => {
             if(userRoles.includes(role.name)){
                 temp_channels = temp_channels.concat(role["channelPermissions"].filter(x => x["permissions"].includes(1)))
             }
         })
         channels = channels.concat(res.group.channels.filter(x => temp_channels.some(y => y['chaName'] == x["name"])))
-        channels = channels.map(channel => {return {"_id": channel._id, "chanName": channel.name}})
+        channels = channels.map(channel => {return {"_id": channel._id, "chaName": channel.name}})
         // console.log(channels)
 
         res.status(200).json({channels: channels, message: "Channels found and sent to user", success: true})
