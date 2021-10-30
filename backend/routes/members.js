@@ -8,6 +8,28 @@ const User = require('../models/users.model')
 const auth = require("../middleware/auth")
 const mongoose = require("mongoose")
 
+router.post("/:id/viewAll", auth, isGroupMember, async (req, res) => {
+
+    try{
+
+        await res.group.populate({
+            path: 'members.memberID',
+            models: 'User',
+            select: {'username': 1}
+        })
+
+        const members = res.group.members.map((x) =>{
+            return {'username': x.memberID.username, 'roles': x.roles}
+        })
+
+        res.status(200).json({message: `Members of ${res.group.name} fetched`, members: members, success: true})
+        
+    } catch(err){
+
+        res.status(500).json({message: err.message, success: false})
+    }
+})
+
 router.post(":id/addMember", auth, isGroupMember, hasPermission({
     category: "Group",
     perm_number: 3
@@ -25,7 +47,7 @@ router.post(":id/addMember", auth, isGroupMember, hasPermission({
         const toSend = await res.group.save();
         res.status(200).json({message: "User added!", success: false, updated: toSend})
     } catch (error) {
-        res.status(400).json({message: error.message, success: false})
+        res.status(500).json({message: error.message, success: false})
     }
 })
 
@@ -46,7 +68,7 @@ router.post(":id/editMemberRole", auth, isGroupMember, hasPermission({
         const savedGroup = await res.group.save();
         res.status(200).json({message: "User roles updated!", success: false, updated: toSend})
     } catch (error) {
-        res.status(400).json({message: error.message, success: false})
+        res.status(500).json({message: error.message, success: false})
     }
 })
 
@@ -76,6 +98,8 @@ router.post(":id/deleteMember", auth, isGroupMember, hasPermission({
         const savedGroup = await res.group.save();
         res.status(200).json({message: "Member removed from group!", success: false})
     } catch (error) {
-        res.status(400).json({message: error.message, success: false})
+        res.status(500).json({message: error.message, success: false})
     }
 })
+
+module.exports = router
