@@ -190,4 +190,33 @@ router.post('/create/', auth, async (req, res) => {
     }
 })
 
+
+router.post("/:id/exitGroup", auth, isGroupMember, async(req, res) => {
+    try {
+        const user_id = res.user._id;
+        const ind = res.group["members"].indexOf(x => x["memberID"] == user_id);
+        
+        var count = 0;
+        for(let i=0; i<res.group["members"].length; i++){
+            if(res.group["members"][i]["roles"].includes("Admin")){
+                count = count+1;
+            };
+        }
+        
+        if(res.group["members"][ind]["roles"].includes("Admin") && count == 1){
+            return res.status(400).json({message: "Atleast one admin is needed in the group!", success: false})
+        }
+
+        res.group["members"] = res.group["members"].filter(x => x["memberID"] != user_id);
+        res.user["groups"] = res.user["groups"].filter(x => x != req.params.id)
+
+        await res.group.save();
+        await res.user.save();
+
+        res.status(200).json({message: "You have exited the group.", success: true})
+    } catch (error) {
+        res.status(500).json({message: error.message, success: false})
+    }
+})
+
 module.exports = router

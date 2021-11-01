@@ -52,10 +52,10 @@ router.post("/:id/viewEvents", auth, isGroupMember, async(req, res) =>{
             }
         }])
         
-        res.status(200).json({"result": eventx})
+        res.status(200).json({message: "Events fetched!", "result": eventx, success: true})
 
     } catch (err) {
-        console.log(err)
+        res.status(500).json({message: err.message, success: false})
     }
 })
 
@@ -68,20 +68,27 @@ router.post('/:id/createEvent', auth, isGroupMember, hasPermission({
             res.status(401).json({message: "Event name has to be provided"})
         }
         else{
+            if(req.body.roles != null){
+                req.body.roles.forEach(role => {
+                    if(!res.group["roles"].includes(role)){
+                        return res.status(400).json({message: "Some/All roles don't exist in the group! Please enter the correct roles!", success: false})
+                    }
+                })
+            }
             res.group.events.push({
                 name: req.body.name,
                 datetime: req.body.datetime,
                 description: req.body.description,
-                attendees: req.body.roles
+                attendees: []
             })
             const updatedConvo = await group.save()
-            res.json(updatedConvo)
+            res.json({"result": updatedConvo, message: `Event "${req.body.name}" created!`, success: true})
         }
 
 
     } catch(err) {
         console.log(err)
-        res.json({message: err.message})
+        res.status(500).json({message: err.message})
     }
 })
 
@@ -97,23 +104,22 @@ router.post("/:id/updateEvent", auth, isGroupMember, hasPermission({
         if(req.body.name != null){
             eventJSON["events.$.name"] = req.body.name;
         }
-        if(req.body.attendees != null){
-            eventJSON["events.$.attendees"] = req.body.attendees;
-        }
         if(req.body.description != null){
             eventJSON["events.$.description"] = req.body.description;
         }
         if(req.body.datetime != null){
             eventJSON["events.$.datetime"] = req.body.datetime;
         }
+        if(req.body.attendees != null){
+            eventJSON["events.$.attendees"] = req.body.attendees;
+        }
         const updateEvent = await conversation.updateOne(query, 
             {'$set': eventJSON})
         
-        res.json(updateEvent)
+        res.status(200).json({message: "Event Member List Edited", success: true, event: updateEvent})
     } catch(err){
-        console.log(err);
+        res.status(500).json({message: err.message, success: false})
     }
-
 })
 
 router.post('/:id/deleteEvent', auth, isGroupMember, hasPermission({
@@ -129,9 +135,9 @@ router.post('/:id/deleteEvent', auth, isGroupMember, hasPermission({
             {'$pull': {"events" : {"_id": req.body.id}}},
             {safe: true}
         );
-        res.json(deleteEvent)
+        res.status(200).json({message: "Event successfully deleted!", success: true})
     } catch (err) {
-        res.json(err)
+        res.status(500).json({message: err.message, success: false})
     }
 })
 
