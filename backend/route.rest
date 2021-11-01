@@ -44,7 +44,7 @@ POST http://localhost:3000/api/userService/login
 Content-Type: application/json
 
 {
-    "email": "alan.blah@python.com",
+    "email": "user2@python.com",
     "password": "1234"
 }
 
@@ -99,8 +99,8 @@ POST http://localhost:3000/api/conversations/create
 Content-Type: application/json
 
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkJydWgxMjMiLCJpYXQiOjE2MzUwOTU5OTEsImV4cCI6MTYzNTEwMzE5MX0.ZMnrpO2K6UzqTg3RG6p6cWsAZ441MLea9tJXGiGAGDE",
-    "name": "CSE Discussions"
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIxIiwiaWF0IjoxNjM1NzYyNTAxLCJleHAiOjE2MzU3Njk3MDF9._FWXVdiD0XoRcCoSreukYydnmBEDoCDi0pA3qD0LNzo",
+    "name": "Group-1"
 }
 
 ###
@@ -152,15 +152,15 @@ Content-Type: application/json
 //****************************************************Channels***************************************************
 
 ###
-POST http://localhost:3000/api/channels/61759709aa3f7bb7b31fa15d/addChannel
+POST http://localhost:3000/api/channels/617fc15aa8f5ba1bc21c8387/addChannel
 Content-Type: application/json
 
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkJydWgxMjMiLCJpYXQiOjE2MzUyMjA4NDYsImV4cCI6MTYzNTIyODA0Nn0.WJ0BPeAz1Ol35B-YNDSn8Ub9ieUceygeCkG-SDMKdUQ",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIxIiwiaWF0IjoxNjM1NzYyNTAxLCJleHAiOjE2MzU3Njk3MDF9._FWXVdiD0XoRcCoSreukYydnmBEDoCDi0pA3qD0LNzo",
     "chaName": "memes",
     "view": ["Everyone"],
-    "write": ["Everyone", "CR"],
-    "edit": ["CR"],
+    "write": ["Admin"],
+    "edit": ["Admin"],
     "delete": ["Admin"]
 }
 

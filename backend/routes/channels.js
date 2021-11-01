@@ -2,11 +2,111 @@ const express = require('express')
 const mongoose = require("mongoose")
 const isGroupMember = require('../middleware/isGroupMember')
 const auth = require('../middleware/auth')
+const message = require('../models/message.model')
+const User = require('../models/users.model')
 const router = express.Router()
 const conversation = require('../models/conversation.model')
 // const message = require('../models/message.model')
 // const User = require('../models/users.model')
 const hasPermission = require('../middleware/hasPermission')
+
+
+const hasPermissionBool = async (toCheck) => {
+    const user = toCheck['user'];
+    const valPerm = toCheck['permission']   
+    const convo = toCheck['convo']
+    const type = toCheck['type'] // channel or group
+    const chaName = toCheck['chaName']
+    var userRoles = []
+        // 
+    
+    var memberx = await conversation.aggregate([{
+        $match: {'_id':  mongoose.Types.ObjectId(convo._id.toString())}
+    }, {
+        $unwind: "$members"
+    }, {
+        $match: {'members.memberID': mongoose.Types.ObjectId(user._id.toString())}
+    }, {
+        $project: {
+            roles: "$members.roles" 
+        }
+    }])
+
+    userRoles = memberx[0]['roles']
+
+
+    if( userRoles == [] ) {
+        // return res.status(500).json({message: "Server error. No roles for user found", success: false})
+        return false;
+    } else {
+
+        var perms = new Set()
+        convo['roles'].forEach(role => {
+            
+            if(userRoles.includes(role.name)){ 
+
+                if(type == 'Group'){
+                    // console.log('hiii', role['groupPermissions'])
+                    role['groupPermissions'].forEach(group_perm => perms.add(group_perm))                            
+                }
+                else if(type == 'Channel'){
+                    var channel_perms = role['channelPermissions'].filter(function (channel) {
+                        return channel.chaName == chaName;
+                    })
+                    channel_perms = channel_perms[0]['permissions']
+                    //console.log(channel_perms)
+                    channel_perms.forEach(cperm => perms.add(cperm))
+                   // console.log(perms)
+                }
+                else{
+
+                    // return res.status(500).json({message: "Internal Server Error",success: false})
+                    return false;
+                }
+            }
+        })
+
+        //console.log('perms', perms)
+        if( perms.has(valPerm) == false ) {
+
+            //console.log('denied here : 2')
+            console.log(perms, toCheck.perm_number)
+            // return res.status(401).json({message: "Permission Denied.", success: false})
+            return false;
+        }
+    }
+    return true;
+    // for(const element of convo['members']){
+    //     console.log('id', element['memberID'])
+    //     if( element['memberID'].toString() == user._id.toString()){
+    //         console.log('in the if')
+    //         userRoles = element['roles']
+    //         break;
+    //     }
+    // }
+    // console.log('user:', userRoles)
+    // if( userRoles == [] ) {
+    //     console.log('denied here : 1')
+    //     res.status(401).send("Permission Denied.")
+    // } else {
+    //     var perms = []
+    //     userRoles.forEach(urole => {
+    //         convo['roles'].forEach(role => {
+    //             if(urole == role['name']){ 
+    //                 console.log('hiii', role['groupPermissions'])
+    //                 perms = perms.concat(role['groupPermissions'])
+    //             }
+    //         })
+    //     })
+    //     console.log('perms', perms)
+    //     if( perms.includes(valPerm) == false ) {
+    //         console.log('denied here : 2')
+    //         return false;
+    //     }
+    // }
+    // return true;
+}
+
 
 router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
     category: 'Group',
@@ -302,6 +402,58 @@ router.post("/:id/viewChannels", auth, isGroupMember, async(req, res) => {
         console.log(error)
         res.status(400).json({message: error.message, success: false});
     }
+})
+
+router.post('/:id/viewMessages/', auth, isGroupMember, hasPermission({
+    category: 'Channel', 
+    perm_number: 1,
+}), async (req, res) => {
+
+    try {
+        const user = res.user;
+        const convo = res.group;
+        var channel;
+        console.log('in viewMessage')
+        for(const ch of convo['channels']){
+            if(req.body.chaName == ch['name']){
+                channel = ch;
+                break;
+            }
+        }
+
+        var messages = [];
+
+        const canWrite = await hasPermissionBool({
+            user: user,
+            convo: convo,
+            permission: 2,
+            type: 'Channel',
+            chaName: channel['name']
+        })
+
+
+        console.log(channel)
+        console.log("hello");
+        for(const mess of channel['messages']){
+            console.log('messageid mid: ', mess)
+            const m = await message.findOne({ _id : mess })
+            const sender = await User.findById(m.senderID)
+            console.log(m)
+            messages.push({
+                sender: sender.username,
+                body: m.body,
+                timeStamp: "2:40"
+            })
+        }
+
+        // console.log({ username: username, canWrite: true })
+
+        res.status(200).json({ messages: messages, canWrite: canWrite })
+
+    } catch (error) {
+        res.status(400).json({message: error.message, success: false});
+    }
+
 })
 
 function editChannel(allroles, role, perm, checkname){
