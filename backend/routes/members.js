@@ -23,12 +23,13 @@ router.post("/:id/viewAll", auth, isGroupMember, async (req, res) => {
         })
 
         res.status(200).json({message: `Members of ${res.group.name} fetched`, members: members, success: true})
-        
+      
     } catch(err){
 
         res.status(500).json({message: err.message, success: false})
     }
 })
+
 
 router.post(":id/addMember", auth, isGroupMember, hasPermission({
     category: "Group",
@@ -58,7 +59,8 @@ router.post(":id/editMemberRole", auth, isGroupMember, hasPermission({
     try {
         const member = await User.findOne({username: req.body.username})
         const mem_id = member._id;
-        const ind = res.group["members"].indexOf(mem_id)
+        const ind = res.group["members"].findIndex(x => x["memberID"] == mem_id)
+
 
         if(req.body.roles.indexOf("Everyone") == -1)
             req.body.roles.push("Everyone");
