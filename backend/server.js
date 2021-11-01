@@ -42,6 +42,8 @@ app.use('/api/members/', members)
 const dm = require('./routes/dms')
 app.use('/api/dms/', dm)
 
+const 
+
 var https_options = {
     key: fs.readFileSync('./security/cert.key'),
     cert: fs.readFileSync('./security/cert.pem')
