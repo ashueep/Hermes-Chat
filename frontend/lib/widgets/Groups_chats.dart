@@ -126,15 +126,7 @@ class Groups_chats extends StatelessWidget {
                             },
                           ),
 
-                          Text(
-                            chats[k].time,
-                            style: TextStyle(
-                              color: Colors.blueGrey,
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          SizedBox(height: 2.5),
+                          SizedBox(height: 1.0),
                           chats[k].unread
                               ? Container(
                                   width: 40.0,

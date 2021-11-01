@@ -1,24 +1,25 @@
-import 'package:chat_app_project/models/Sending_login_credentials_to_API.dart';
-import 'package:chat_app_project/models/getting_DM_List.dart';
-import 'package:chat_app_project/pages/User_dashboard.dart';
-import 'package:chat_app_project/pages/create_account_page.dart';
+import 'package:chat_app_project/pages/show_events.dart';
 import 'package:chat_app_project/repeated_colors/repeated_colors.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
-import '../global_variables.dart';
+class change_event_details extends StatefulWidget {
+  const change_event_details({Key? key}) : super(key: key);
 
-class LoginScreen extends StatefulWidget {
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _change_event_detailsState createState() => _change_event_detailsState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final Username_controller = TextEditingController();
-  final Password_controller = TextEditingController();
+class _change_event_detailsState extends State<change_event_details> {
+  final Group_name_controller = TextEditingController();
+  final date_time_controller = TextEditingController();
+  final event_description_controller = TextEditingController();
+
   bool _rememberMe = false;
 
-  void _showDialog_for_login_failure(BuildContext context,String message) {
+  void _showDialog_for_create_new_group_failure(BuildContext context,String message) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -38,12 +39,12 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildEmailTF() {
+  Widget _buildEditEventNameDMTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          'Email',
+          'Edited Event Name',
           style: kLabelStyle,
         ),
         SizedBox(height: 10.0),
@@ -52,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextField(
-            controller: Username_controller,
+            controller: Group_name_controller,
             keyboardType: TextInputType.emailAddress,
             style: TextStyle(
               color: Colors.white,
@@ -62,10 +63,10 @@ class _LoginScreenState extends State<LoginScreen> {
               border: InputBorder.none,
               contentPadding: EdgeInsets.only(top: 14.0),
               prefixIcon: Icon(
-                Icons.email,
+                Icons.group,
                 color: Colors.white,
               ),
-              hintText: 'Enter Username',
+              hintText: "enter new name of event",
               hintStyle: kHintTextStyle,
             ),
           ),
@@ -74,12 +75,12 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildPasswordTF() {
+  Widget _buildEditEventDescriptionDMTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          'Password',
+          'Edit Event Description',
           style: kLabelStyle,
         ),
         SizedBox(height: 10.0),
@@ -88,8 +89,8 @@ class _LoginScreenState extends State<LoginScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextField(
-            controller: Password_controller,
-            obscureText: true,
+            controller: event_description_controller,
+            keyboardType: TextInputType.emailAddress,
             style: TextStyle(
               color: Colors.white,
               fontFamily: 'OpenSans',
@@ -98,10 +99,10 @@ class _LoginScreenState extends State<LoginScreen> {
               border: InputBorder.none,
               contentPadding: EdgeInsets.only(top: 14.0),
               prefixIcon: Icon(
-                Icons.lock,
+                Icons.group,
                 color: Colors.white,
               ),
-              hintText: 'Enter your Password',
+              hintText: "Enter Edited Event Description",
               hintStyle: kHintTextStyle,
             ),
           ),
@@ -110,47 +111,75 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildForgotPasswordBtn() {
-    return Container(
-      alignment: Alignment.centerRight,
-      child: FlatButton(
-        onPressed: () => print('Forgot Password Button Pressed'),
-        padding: EdgeInsets.only(right: 0.0),
-        child: Text(
-          'Forgot Password?',
+
+  Widget _buildEditDateDMTF() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          'Edited Event Date',
           style: kLabelStyle,
         ),
-      ),
+        SizedBox(height: 10.0),
+        Container(
+          alignment: Alignment.centerLeft,
+          decoration: kBoxDecorationStyle,
+          height: 60.0,
+          child: TextField(
+            controller: date_time_controller,
+            onTap: () async {
+              DateTime? pickedDate = await showDatePicker(
+                  context: context, initialDate: DateTime.now(),
+                  firstDate: DateTime(2000), //DateTime.now() - not to allow to choose before today.
+                  lastDate: DateTime(2101)
+              );
+
+              if(pickedDate != null ){
+                print(pickedDate);  //pickedDate output format => 2021-03-10 00:00:00.000
+                String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+                print(formattedDate); //formatted date output using intl package =>  2021-03-16
+                //you can implement different kind of Date Format here according to your requirement
+
+                setState(() {
+                  date_time_controller.text = formattedDate; //set output date to TextField value.
+                });
+              }else{
+                print("Date is not selected");
+              }
+            },
+            readOnly: true,
+            keyboardType: TextInputType.datetime,
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: 'OpenSans',
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.only(top: 14.0),
+              prefixIcon: Icon(
+                Icons.group,
+                color: Colors.white,
+              ),
+              hintText: "Edit Event Date",
+              hintStyle: kHintTextStyle,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildLoginBtn() {
+
+  Widget _buildEditEventBtn() {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 25.0),
       width: double.infinity,
       child: RaisedButton(
         elevation: 5.0,
         onPressed: () async {
-             final List<String> reponse_from_API_for_login = await sendData((Username_controller.text).toString(),(Password_controller.text).toString());
-
-             if(reponse_from_API_for_login[1]=="true")
-               {
-                 final List<String> response_for_requesting_DM_List = await fetch_DM_List(jwt_token);
-                 if(response_for_requesting_DM_List=="true")
-                   {
-                     Navigator.push(context,
-                         MaterialPageRoute(builder: (context) => User_dashboard()));
-                   }
-                 else
-                   {
-                     _showDialog_for_login_failure(context,reponse_from_API_for_login[0]);
-                   }
-
-               }
-
-             reponse_from_API_for_login[1]=="true" ?
-           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => User_dashboard())) : _showDialog_for_login_failure(context,reponse_from_API_for_login[0]);
+          //final List<String> reponse_from_API_for_login = await sendData((Group_name_controller.text).toString(),(Password_controller.text).toString());
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => show_events()));
         },
         padding: EdgeInsets.all(15.0),
         shape: RoundedRectangleBorder(
@@ -158,7 +187,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         color: Colors.white,
         child: Text(
-          'LOGIN',
+          'EDIT EVENT',
           style: TextStyle(
             color: Color(0xFF527DAA),
             letterSpacing: 1.5,
@@ -171,35 +200,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildSignupBtn() {
-    return GestureDetector(
-      onTap: () => Navigator.push(context,
-          MaterialPageRoute(builder: (context) => create_account())),//Navigator.push(context,
-          //MaterialPageRoute(builder: (context) => create_account())),
-      child: RichText(
-        text: TextSpan(
-          children: [
-            TextSpan(
-              text: 'Don\'t have an Account? ',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.0,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-            TextSpan(
-              text: 'Sign Up',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -239,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Text(
-                        'HERMES Sign In',
+                        'Edit Event: ',
                         style: TextStyle(
                           color: Colors.white,
                           fontFamily: 'OpenSans',
@@ -248,14 +248,16 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       SizedBox(height: 30.0),
-                      _buildEmailTF(),
+                      _buildEditEventNameDMTF(),
                       SizedBox(
                         height: 30.0,
                       ),
-                      _buildPasswordTF(),
-                      _buildForgotPasswordBtn(),
-                      _buildLoginBtn(),
-                      _buildSignupBtn(),
+                      _buildEditDateDMTF(),
+                      SizedBox(height: 30.0),
+                      _buildEditEventDescriptionDMTF(),
+                      SizedBox(height: 30.0),
+                      _buildEditEventBtn(),
+
                     ],
                   ),
                 ),

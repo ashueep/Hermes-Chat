@@ -1,4 +1,6 @@
+import 'package:chat_app_project/models/dm_model.dart';
 import 'package:chat_app_project/models/message_model.dart';
+import 'package:chat_app_project/models/request_for_list_of_messages_DM.dart';
 import 'package:chat_app_project/pages/chat_window.dart';
 import 'package:flutter/material.dart';
 
@@ -21,13 +23,16 @@ class chats_received_sent extends StatelessWidget {
             topRight: Radius.circular(28.0),
           ),
           child: ListView.builder(
-            itemCount: chats.length,
+            itemCount: list_of_DMs.length,
             itemBuilder: (BuildContext context, int k) {
               return GestureDetector(
-                onTap: () => Navigator.push(
+                onTap: () async {
+                    await request_for_list_of_messages_for_DM(k);
+                    Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => Chat_Window(person1: chats[k].sender))),
+                        builder: (_) => Chat_Window(iter: k,full_name: list_of_DMs[k].friend.full_name)));
+                },
                 child: Container(
                   margin: EdgeInsets.only(
                     top: 5.0,
@@ -37,7 +42,7 @@ class chats_received_sent extends StatelessWidget {
                   padding:
                       EdgeInsets.symmetric(horizontal: 7.5, vertical: 10.0),
                   decoration: BoxDecoration(
-                      color: chats[k].unread ? Color(0xFFFFEFEE) : Colors.white,
+                      color: true ? Color(0xFFFFEFEE) : Colors.white,
                       borderRadius: BorderRadius.only(
                         topRight: Radius.circular(20.0),
                         bottomRight: Radius.circular(20.0),
@@ -50,7 +55,7 @@ class chats_received_sent extends StatelessWidget {
                           CircleAvatar(
                             radius: 35.0,
                             backgroundImage:
-                                AssetImage(chats[k].sender.imageUrl),
+                                AssetImage('assets/images/greg.jpg.png'),
                           ),
                           SizedBox(width: 10.0),
                           Column(
@@ -59,7 +64,7 @@ class chats_received_sent extends StatelessWidget {
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.50,
                                 child: Text(
-                                  chats[k].sender.name,
+                                  list_of_DMs[k].friend.full_name,
                                   style: TextStyle(
                                     color: Colors.grey,
                                     fontSize: 20.0,
@@ -70,7 +75,7 @@ class chats_received_sent extends StatelessWidget {
                               ),
                               SizedBox(height: 5.0),
                               Text(
-                                chats[k].text,
+                                "",
                                 style: TextStyle(
                                   color: Colors.blueGrey,
                                   fontSize: 17.0,
@@ -84,7 +89,7 @@ class chats_received_sent extends StatelessWidget {
                       Column(
                         children: <Widget>[
                           Text(
-                            chats[k].time,
+                            "2:40",
                             style: TextStyle(
                               color: Colors.blueGrey,
                               fontSize: 18.0,
@@ -92,7 +97,7 @@ class chats_received_sent extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 5.0),
-                          chats[k].unread
+                          true
                               ? Container(
                                   width: 40.0,
                                   height: 20.0,

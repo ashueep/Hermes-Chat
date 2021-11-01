@@ -6,7 +6,7 @@ import 'package:chat_app_project/widgets/Groups_chats.dart';
 import 'package:chat_app_project/widgets/messages_sent_recieved.dart';
 import 'package:chat_app_project/widgets/recent_chats_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+
 
 class Group_Page extends StatefulWidget {
   Group_Page({Key? key}) : super(key: key);

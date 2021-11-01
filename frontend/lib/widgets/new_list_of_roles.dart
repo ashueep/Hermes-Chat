@@ -1,6 +1,8 @@
 import 'package:chat_app_project/models/Groups.dart';
 import 'package:chat_app_project/pages/Groups_Page.dart';
+import 'package:chat_app_project/pages/change_role_name_page.dart';
 import 'package:chat_app_project/pages/edit_roles_and_permissions.dart';
+import 'package:chat_app_project/pages/show_roles.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -60,7 +62,7 @@ class _new_list_of_rolesState extends State<new_list_of_roles> {
             ),
             new FlatButton(
                 onPressed: () {Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Group_Page()));},
+                    MaterialPageRoute(builder: (context) => show_roles()));},
                 child: new Text("YES"))
           ],
         );
@@ -133,8 +135,12 @@ class _new_list_of_rolesState extends State<new_list_of_roles> {
                           PopupMenuButton(itemBuilder: (context) {
                             return [
                               PopupMenuItem(
-                                value: 'edit',
-                                child: Text('Edit Role',style: TextStyle(fontWeight: FontWeight.bold),),
+                                value: 'edit permissions',
+                                child: Text('Edit Role Permissions',style: TextStyle(fontWeight: FontWeight.bold),),
+                              ),
+                              PopupMenuItem(
+                                value: 'edit role name',
+                                child: Text('Edit Role Name',style: TextStyle(fontWeight: FontWeight.bold),),
                               ),
                               PopupMenuItem(
                                 value: 'delete',
@@ -143,13 +149,21 @@ class _new_list_of_rolesState extends State<new_list_of_roles> {
                             ];
                           },
                             onSelected: (String value){
-                              if(value=='edit'){
+                              if(value=='edit permissions'){
                                 Navigator.push(context,
                                     MaterialPageRoute(builder: (context) => edit_roles_and_permissions()));
                               }
+
+                              else if(value=='edit role name')
+                              {
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) => change_role_name(curr_role_name: roles[k],)));
+                              }
+
                               else if(value=='delete')
                               {
-                                _showDialog_for_confirm_delete_account(context, groups[k].Group_name);
+                                roles.removeAt(k);
+                                _showDialog_for_confirm_delete_account(context, roles[k]);
                               }
                             },
                           ),

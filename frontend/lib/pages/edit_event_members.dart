@@ -1,23 +1,20 @@
-import 'package:chat_app_project/models/Groups.dart';
-import 'package:chat_app_project/models/Sending_login_credentials_to_API.dart';
-import 'package:chat_app_project/models/message_model.dart';
-import 'package:chat_app_project/pages/Groups_Page.dart';
-import 'package:chat_app_project/pages/chat_window.dart';
-import 'package:chat_app_project/pages/edit_roles_and_permissions.dart';
-import 'package:chat_app_project/pages/group_channels.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:math';
 
-class permission_for_a_particular_role extends StatefulWidget {
+import 'Groups_Page.dart';
+
+class edit_event_members extends StatefulWidget {
+  const edit_event_members({Key? key}) : super(key: key);
+
   @override
-  State<permission_for_a_particular_role> createState() => _permission_for_a_particular_roleState();
+  _edit_event_membersState createState() => _edit_event_membersState();
 }
 
-class _permission_for_a_particular_roleState extends State<permission_for_a_particular_role> {
+class _edit_event_membersState extends State<edit_event_members> {
   @override
   List<String> roles=["Teacher","Student","Principal","Administrator"];
 
-  List<String> permissions=["Edit Group Name","Delete Group","Add channels","add/modify/delete roles","add/remove members","Add/edit/delete events"];
+  //List<String> permissions=["Edit Group Name","Delete Group","Add channels","add/modify/delete roles","add/remove members","Add/edit/delete events"];
 
   List<bool> value1=[false,false,false,false,false,false];
 
@@ -96,7 +93,7 @@ class _permission_for_a_particular_roleState extends State<permission_for_a_part
             topRight: Radius.circular(28.0),
           ),
           child: ListView.builder(
-            itemCount: permissions.length,
+            itemCount: roles.length,
             itemBuilder: (BuildContext context, int k) {
               return GestureDetector(
                 onTap: () {print("role pressed");},
@@ -126,7 +123,7 @@ class _permission_for_a_particular_roleState extends State<permission_for_a_part
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.50,
                                 child: Text(
-                                  permissions[k],
+                                  roles[k],
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 20.0,

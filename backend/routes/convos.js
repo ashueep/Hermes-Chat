@@ -3,30 +3,10 @@ const router = express.Router()
 const conversation = require('../models/conversation.model')
 const message = require('../models/message.model')
 const User = require('../models/users.model')
+
+//Middleware
 const auth = require("../middleware/auth")
-
-//TODO: to add user auth
-
-/*
-List of permissions:
-
-Group Permissions:
-
-1: add channels (this will imply that the role creating the channel will have channel edit and delete permissions by default)
-2: add/modify/delete roles
-3: add/remove members
-4. Add/edit/delete events
-5. Delete group (Admin only)
-
-Channel Permissions:
-
-1: view messages
-2: send message
-3: edit (includes channel name and channel permissions)
-4: delete channel (Nobody should have the permission to delete general channel)
-
-
-*/
+const isGroupMember = require('../middleware/isGroupMember')
 
 router.get('/allgroups/', async (req, res) => {
     try {
@@ -34,6 +14,134 @@ router.get('/allgroups/', async (req, res) => {
         res.json(convos)
     } catch(err) {
         res.status(400).json(err)
+    }
+})
+
+//Used while loading groups page
+/*
+    Send:
+    1. Group id
+    2. Group name
+    3. List of user roles (For edit name and delete group)
+*/
+router.post('/getGroups/', auth, async (req, res) => {
+
+    try {
+
+        await res.user.populate({
+            path: 'groups',
+            model: 'Conversation',
+            select: {'name': 1, 'members': 1, 'roles': 1}
+        });
+
+        let index = 0
+        let result = []
+
+        for(let group of res.user.groups){
+
+            result.push({_id: group._id, name: group.name, user_roles: []})
+
+            //Find user member from group member list
+            let member = group.members.find(some_member => some_member.memberID.toString() == res.user._id.toString())
+            if(!member){
+                res.status(500).json({message: `Member record of corresponding user not found in group ${group.name}`, success: false})
+            }
+
+            for(let user_role of member.roles){
+
+                let found_role = group.roles.find(some_role => some_role.name == user_role)
+                if(!found_role){
+                    res.status(500).json({message: `Role ${user_role} not found in group ${group.name}`, success: false})
+                }
+
+                result[index].user_roles.push(found_role)
+            }
+
+            index++
+        }
+
+        res.status(200).json({message: "Groups found", groups: result, success: true})
+    } catch (err){
+
+        res.status({message: err.message, success: false})
+    }
+})
+
+//Used while loading specific group
+/*
+    Send:
+    1. Group id
+    2. Group name
+    3. List of user roles (For edit name and delete channel)
+    4. List of channels (name and ids)
+
+*/
+router.post('/:id/getGroup/', auth, isGroupMember, async (req, res) => {
+
+    try{
+
+        let group = {}
+        group._id = ""
+        group.name = ""
+        group.user_roles = []
+        group.channels = []
+
+        group._id= res.group._id
+        group.name = res.group.name
+
+        //Find user's member record in member list
+        const member = res.group.members.find(some_member =>
+            some_member.memberID.toString() == res.user._id.toString())
+        //Get all user's roles
+        group.user_roles = res.group.roles.filter(role => member['roles'].some(user_role => user_role === role.name))
+
+        //Get channels to whuich user has view permission
+        let channelSet = new Set()
+        let user_roles = []
+        for(let user_role of member.roles) {
+
+            //Find role in roles array
+            let found_role = res.group.roles.find(some_role => some_role.name == user_role)
+            if(!found_role){
+
+                return res.status(404).json({message: `User role "${user_role}" not found in group`, success: false})
+            }
+            user_roles.push(found_role)
+
+            if(found_role.channelPermissions){
+
+                for(let chaPerm of found_role.channelPermissions){
+
+                    let channel_index = res.group.channels.findIndex(channel => channel.name == chaPerm.chaName)
+                    if(channel_index == -1){
+
+                        return res.status(404).json({message: `Channel "${chaPerm.chaName}" not found in group`, success: false})
+                    }
+
+                    if(chaPerm.permissions.includes(1) && !channelSet.has(chaPerm.chaName)){
+
+                        channelSet.add(chaPerm.chaName)
+
+                        group.channels.push({
+                            _id: res.group.channels[channel_index]._id, 
+                            chaName: res.group.channels[channel_index].name
+                        })
+                    }
+                
+                }
+            }
+        }
+        
+        //Return group details
+        res.status(200).json({
+            message: `Fetched group "${group.name}"`, 
+            group_name : res.group.name,
+            user_roles: user_roles, channels: group.channels, success: true
+        })
+        
+    } catch(err){
+
+        res.status(500).json({message: err.message, success: false})
     }
 })
 
@@ -67,79 +175,18 @@ router.post('/create/', auth, async (req, res) => {
                     chaName: 'general',
                     permissions: [1,2]
                 }]
-            }]
+            }],
+            events: []
         })
 
         res.user.groups.push(convo._id)
         await res.user.save()
+        console.log(convo)
         const toSend = await convo.save();
-        res.status(201).json({group: toSend, message: "Group has beem created successfully", created: true})
+        res.status(201).json({group: toSend, message: "Group has been created successfully", created: true})
 
     } catch(err) {
-        res.status(400).json(err)
-    }
-})
-
-/* 
-{
-    username: 
-    roles: []
-}
-*/
-
-router.post('/:id/adduser/', async (req, res) => {
-    try {
-        const convo = await conversation.findOne({ _id : req.params.id });
-        const user = await User.findOne({ username : req.body.username });
-
-        console.log('trying', user._id)
-
-        var userRoles = []
-        // 
-        for(const element of convo['members']){
-            console.log('id', element['memberID'].toString())
-            if( element['memberID'].toString() == user._id.toString()){
-                console.log('in the if')
-                userRoles = element['roles']
-                break;
-            }
-        }
-        console.log('user:', userRoles)
-        if( userRoles == [] ) {
-            console.log('denied here : 1')
-            res.status(401).send("Permission Denied.")
-        } else {
-            var perms = []
-            userRoles.forEach(urole => {
-                convo['roles'].forEach(role => {
-                    if(urole == role['name']){ 
-                        console.log('hiii', role['groupPermissions'])
-                        perms = perms.concat(role['groupPermissions'])
-                    }
-                })
-            })
-            console.log('perms', perms)
-            if(  perms.includes(3) == false ) {
-                console.log('denied here : 2')
-                res.status(401).send("Permission Denied.")
-                return;
-            }
-        }
-        //
-        const member = await User.findOne({ username : req.body.member });
-
-        console.log('member', member._id)
-
-        convo['members'].push({
-            memberID: member._id,
-            roles: req.body.roles
-        })
-
-        const toSend = await convo.save()
-        res.status(201).json(toSend)
-
-    } catch(err) {
-        res.status(400).json(err)
+        res.status(500).json(err)
     }
 })
 

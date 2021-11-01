@@ -8,11 +8,12 @@ const { text } = require('express');
 /*
 
 */
-
+console.log("socket running");
 const insert = async (sender, body, room, timestamp) => {
     const dm = await DM.findById(room);
+    const senderID = await user.findOne({ username: sender })
     const newmess = new message({
-        senderID: sender,
+        senderID: senderID._id,
         body: body,
         timestamp: timestamp,
     })
@@ -24,7 +25,8 @@ const insert = async (sender, body, room, timestamp) => {
 
 io.on('connection', socket => {
     socket.on('connectDM', (dmid) => {
-        socket.join(dmid);
+        socket.join(dmid['dmid']);
+        console.log(dmid, "has connected");
     })
     socket.on('sendDM', message => {
         room = message.room
@@ -32,13 +34,13 @@ io.on('connection', socket => {
         text = message.text
 
         const time = Date.now()
-
+        console.log("received dm");
         insert(sender, text, room, time)
 
-        socket.to(room).emit('recvDM', {
-            senderID: sender,
+        socket.in(room).emit('recvDM', {
+            sender_username: sender,
             body: text,
-            timestamp: time
+            timestamp: "2:40"
         })
 
     })

@@ -36,6 +36,9 @@ app.use('/api/messages/', messages)
 const convo = require('./routes/convos')
 app.use('/api/conversations/', convo)
 
+const members = require('./routes/members.js')
+app.use('/api/members/', members)
+
 const dm = require('./routes/dms')
 app.use('/api/dms/', dm)
 

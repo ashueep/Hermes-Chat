@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 
 class group_members extends StatelessWidget {
   final List<USER> members;
-  final List<String> group_customizations=["Roles","Events","Group Members"];
+  final List<String> group_customizations=["Roles","Events","Members"];
   group_members({required this.members});
 
   void select_group_customization(int k,context)

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:chat_app_project/models/dm_model.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:chat_app_project/global_variables.dart';
@@ -22,6 +23,8 @@ Future <List<String>> logout_request() async
     return ["Server Failure","false"];
   }
   else{
+    login_status=false;
+    list_of_DMs=[];
     var decoded_logout_data = jsonDecode(returned_logout_result.body);
     print(decoded_logout_data);
     temp_message_for_logout = decoded_logout_data['message'];
