@@ -136,6 +136,7 @@ router.post('/:id/getGroup/', auth, isGroupMember, async (req, res) => {
         res.status(200).json({
             message: `Fetched group "${group.name}"`, 
             group_name : res.group.name,
+            all_roles: res.group.roles,
             user_roles: user_roles, channels: group.channels, success: true
         })
         

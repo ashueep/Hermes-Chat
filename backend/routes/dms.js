@@ -31,25 +31,25 @@ router.post('/viewDM/', auth, async (req, res) => {
         const user=res.user;
         const userdms=res.user['dms'];
         var dms = [];
+        console.log(user._id);
         console.log(dms);
         for(const dmid of userdms){
             const dm = await conversation.findById(dmid)
             console.log(1)
-            const members = dm['members']
-            var rec
+            const members = dm['members'].filter(x => {
+                return x.toString() != user._id.toString();
+            })
+            console.log(members);
+            var rec1;
             console.log(2)
-            if(user._id == members[0]){
-                rec = await User.findById(members[1])
-            } else {
-                rec = await User.findById(members[0])
-            }
+            rec1 = await User.findById(members[0])
             console.log(3)
             dms.push({
                 dmid : dm._id,
                 friend: {
-                    username: rec['username'],
-                    fullname: rec['fullname'],
-                    id: rec._id
+                    username: rec1['username'],
+                    fullname: rec1['fullname'],
+                    id: rec1._id
                 },
                 // lastmessage: dm['message'][dm['message'].length - 1] 
             })
@@ -58,7 +58,7 @@ router.post('/viewDM/', auth, async (req, res) => {
 
     }catch(error){
         console.log(error)
-        res.sendStatus(500)
+        res.status(500).json({message: error.message, success: false})
     }
 })
 

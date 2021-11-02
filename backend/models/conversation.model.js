@@ -40,7 +40,7 @@ const convoSchema = mongoose.Schema({
             type: String
         },
         datetime: {
-            type: Date,
+            type: String,
         },
         description: {
             type: String,

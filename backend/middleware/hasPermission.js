@@ -39,7 +39,7 @@ function hasRolePermission(toCheck){
             } else {
 
                 var perms = new Set()
-                res.group['roles'].forEach(role => {
+                for(let role of res.group['roles']) {
                     
                     if(userRoles.includes(role.name)){ 
 
@@ -51,17 +51,23 @@ function hasRolePermission(toCheck){
                             var channel_perms = role['channelPermissions'].filter(function (channel) {
                                 return channel.chaName == req.body.chaName;
                             })
+                            if(!channel_perms || !channel_perms.length){
+                                continue
+                            }
+
+                            console.log('line 54')
                             channel_perms = channel_perms[0]['permissions']
-                            //console.log(channel_perms)
+                            // console.log('line 56')
+                            console.log(channel_perms)
                             channel_perms.forEach(cperm => perms.add(cperm))
-                           // console.log(perms)
+                           console.log(perms)
                         }
                         else{
 
                             return res.status(500).json({message: "Internal Server Error",success: false})
                         }
                     }
-                })
+                }
 
                 //console.log('perms', perms)
                 if( perms.has(toCheck.perm_number) == false ) {

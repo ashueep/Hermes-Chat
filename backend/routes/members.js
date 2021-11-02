@@ -31,7 +31,7 @@ router.post("/:id/viewAll", auth, isGroupMember, async (req, res) => {
 })
 
 
-router.post(":id/addMember", auth, isGroupMember, hasPermission({
+router.post("/:id/addMember", auth, isGroupMember, hasPermission({
     category: "Group",
     perm_number: 3
 }), async (req, res) => {
@@ -56,7 +56,7 @@ router.post(":id/addMember", auth, isGroupMember, hasPermission({
     }
 })
 
-router.post(":id/editMemberRole", auth, isGroupMember, hasPermission({
+router.post("/:id/editMemberRole/", auth, isGroupMember, hasPermission({
     category: "Group",
     perm_number: 2
 }), async(req, res) => {
@@ -71,13 +71,13 @@ router.post(":id/editMemberRole", auth, isGroupMember, hasPermission({
         res.group["members"][ind]["roles"] = req.body.roles;
 
         const savedGroup = await res.group.save();
-        res.status(200).json({message: "User roles updated!", success: true, updated: toSend})
+        res.status(200).json({message: "User roles updated!", success: true, updated: savedGroup})
     } catch (error) {
         res.status(500).json({message: error.message, success: false})
     }
 })
 
-router.post(":id/deleteMember", auth, isGroupMember, hasPermission({
+router.post("/:id/deleteMember", auth, isGroupMember, hasPermission({
     category: "Group",
     perm_number: 3
 }), async(req, res) => {
@@ -97,7 +97,6 @@ router.post(":id/deleteMember", auth, isGroupMember, hasPermission({
         if(mem_roles.includes("Admin") && !user_roles.includes("Admin")){
             return res.status(400).json({message: "Cannot remove Admin unless you have an Admin role", success: false})
         }
-
         res.group["members"] = res.group["members"].filter(x => x["memberID"].toString() != mem_id.toString())
         member["groups"] = member["groups"].filter(x => x.toString() != res.group._id.toString())
 
