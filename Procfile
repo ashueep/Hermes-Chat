@@ -1,1 +1,1 @@
-web: npm i && npm run heroku-start
+web: cd backend && npm start
