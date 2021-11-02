@@ -230,7 +230,7 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
 
 router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
     category: 'Channel',
-    perm_number: 4
+    perm_number: 3
 }), async (req, res) => {
     try{
 
@@ -309,6 +309,7 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
         }
         
         await res.group.save()
+        console.log(JSON.stringify(res.group, 2, null))
         res.status(200).json({message: "Edited channel", success: true})
         
     } catch(err) {
@@ -398,7 +399,12 @@ router.post("/:id/viewAll", auth, isGroupMember, async(req, res) => {
             }
         })
 
-        res.status(200).json({message: "Channels found and sent to user", channels: channels, user_roles: user_roles, success: true})
+        res.status(200).json({
+            message: "Channels found and sent to user", 
+            channels: channels, 
+            all_roles: res.group.roles,
+            user_roles: user_roles, 
+            success: true})
 
 
     } catch (error) {

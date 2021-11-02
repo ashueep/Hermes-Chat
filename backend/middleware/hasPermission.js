@@ -51,10 +51,12 @@ function hasRolePermission(toCheck){
                             var channel_perms = role['channelPermissions'].filter(function (channel) {
                                 return channel.chaName == req.body.chaName;
                             })
+                            console.log('line 54')
                             channel_perms = channel_perms[0]['permissions']
-                            //console.log(channel_perms)
+                            // console.log('line 56')
+                            console.log(channel_perms)
                             channel_perms.forEach(cperm => perms.add(cperm))
-                           // console.log(perms)
+                           console.log(perms)
                         }
                         else{
 

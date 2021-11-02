@@ -52,7 +52,9 @@ router.post("/:id/viewEvents", auth, isGroupMember, async(req, res) =>{
             }
         }])
         
+
         res.status(200).json({message: "Events fetched!", "result": eventx, success: true})
+
 
     } catch (err) {
         res.status(500).json({message: err.message, success: false})
@@ -70,7 +72,7 @@ router.post('/:id/createEvent', auth, isGroupMember, hasPermission({
         else{
             if(req.body.roles != null){
                 req.body.roles.forEach(role => {
-                    if(!res.group["roles"].includes(role)){
+                    if(!res.group["roles"].some(x => x["name"] == role)){
                         return res.status(400).json({message: "Some/All roles don't exist in the group! Please enter the correct roles!", success: false})
                     }
                 })
@@ -79,10 +81,12 @@ router.post('/:id/createEvent', auth, isGroupMember, hasPermission({
                 name: req.body.name,
                 datetime: req.body.datetime,
                 description: req.body.description,
-                attendees: []
+                attendees: ["Everyone"]
             })
-            const updatedConvo = await group.save()
+
+            const updatedConvo = await res.group.save()
             res.json({"result": updatedConvo, message: `Event "${req.body.name}" created!`, success: true})
+
         }
 
 
@@ -135,7 +139,9 @@ router.post('/:id/deleteEvent', auth, isGroupMember, hasPermission({
             {'$pull': {"events" : {"_id": req.body.id}}},
             {safe: true}
         );
+
         res.status(200).json({message: "Event successfully deleted!", success: true})
+
     } catch (err) {
         res.status(500).json({message: err.message, success: false})
     }

@@ -72,11 +72,11 @@ Content-Type: application/json
 //*******************************************DMs Section********************************************
 
 //Get all dms of a user
-GET http://localhost:3000/api/dms/getAll
+POST http://localhost:3000/api/dms/viewDM
 Content-Type: application/json
 
 {
-    "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkJydWgxMjMiLCJpYXQiOjE2MzUwODUwNzMsImV4cCI6MTYzNTA5MjI3M30.yurp0gh6n9Pz7FvX67HL5_Z3G_bCEiFEzVST2X9_7K4"
+    "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFsYW4iLCJpYXQiOjE2MzU3MDU0MzcsImV4cCI6MTYzNTcxMjYzN30.77JXXrB1JSmd5QQl230pbKesLEfjfpLFy88z5aUMGsU"
 }
 
 ###
@@ -99,31 +99,33 @@ POST http://localhost:3000/api/conversations/create
 Content-Type: application/json
 
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIxIiwiaWF0IjoxNjM1NzYyNTAxLCJleHAiOjE2MzU3Njk3MDF9._FWXVdiD0XoRcCoSreukYydnmBEDoCDi0pA3qD0LNzo",
-    "name": "Group-1"
+
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFsYW4iLCJpYXQiOjE2MzU3OTg5NTksImV4cCI6MTYzNTg3MDk1OX0.Lu4fPyy_peywkMhI1wUiUTf5DgDiOBlibDLKHMTvHyE",
+    "name": "SE lab"
+
 }
 
 ###
 //******************************************Roles section********************************************
 
 //Fetch all roles of a group
-POST http://localhost:3000/api/roles/61759709aa3f7bb7b31fa15d/getAll
+POST http://localhost:3000/api/roles/617be91deb1123ffd8f81e39/getAll
 Content-Type: application/json
 
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkJydWgxMjMiLCJpYXQiOjE2MzUyMjA4NDYsImV4cCI6MTYzNTIyODA0Nn0.WJ0BPeAz1Ol35B-YNDSn8Ub9ieUceygeCkG-SDMKdUQ"
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFsYW4iLCJpYXQiOjE2MzU2MDQxNzAsImV4cCI6MTYzNTYxMTM3MH0.dWLYt3xgypOCM9Aim-r99mdfNRaCl93eolLs3yeFr7s"
 }
 
 ###
 
 //Create new role
-POST http://localhost:3000/api/roles/61759709aa3f7bb7b31fa15d/addRole
+POST http://localhost:3000/api/roles/617be91deb1123ffd8f81e39/addRole
 Content-Type: application/json
 
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkJydWgxMjMiLCJpYXQiOjE2MzUxOTA2MDAsImV4cCI6MTYzNTE5NzgwMH0.B_8KsXIl6TmswGYZXlwb6eG1W94K-hMF6b1GKEGifGs",
-    "name": "CR",
-    "groupPermissions": [1, 2, 3]
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFsYW4iLCJpYXQiOjE2MzU1ODA0MzAsImV4cCI6MTYzNTU4NzYzMH0.Zz51vCYYN0m-9QfEI9q7DYyqsWFHQ8iCMTAyRsusEBs",
+    "name": "headgirl",
+    "groupPermissions": [1, 2, 4]
 }
 
 ###
@@ -152,11 +154,12 @@ Content-Type: application/json
 //****************************************************Channels***************************************************
 
 ###
-POST http://localhost:3000/api/channels/617fc15aa8f5ba1bc21c8387/addChannel
+
+POST http://localhost:3000/api/channels/617be91deb1123ffd8f81e39/addChannel
 Content-Type: application/json
 
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIxIiwiaWF0IjoxNjM1NzYyNTAxLCJleHAiOjE2MzU3Njk3MDF9._FWXVdiD0XoRcCoSreukYydnmBEDoCDi0pA3qD0LNzo",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFsYW4iLCJpYXQiOjE2MzU2MDQxNzAsImV4cCI6MTYzNTYxMTM3MH0.dWLYt3xgypOCM9Aim-r99mdfNRaCl93eolLs3yeFr7s",
     "chaName": "memes",
     "view": ["Everyone"],
     "write": ["Admin"],
@@ -190,18 +193,13 @@ Content-Type: application/json
 //*****************************************************Events*****************************************************
 
 ###
-POST http://localhost:3000/api/events/61759709aa3f7bb7b31fa15d/viewEvents
+POST http://localhost:3000/api/events/617be91deb1123ffd8f81e39/viewEvents
 Content-Type: application/json
 
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXI2IiwiaWF0IjoxNjM1MTg3MTAxLCJleHAiOjE2MzUxOTQzMDF9.0cAcdEhbsh1vPtdPog0RhdNAycSVGKNaKBm_ehOKW-o"
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFsYW4iLCJpYXQiOjE2MzU3MDU0MzcsImV4cCI6MTYzNTcxMjYzN30.77JXXrB1JSmd5QQl230pbKesLEfjfpLFy88z5aUMGsU"
 }
-=======
 
-{
-    "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFsYW4iLCJpYXQiOjE2MzUwNjg3NTcsImV4cCI6MTYzNTA3NTk1N30.rlGQ7KFTe9XUW6DkcjpWtIrGLKeQ0dA4TCBY452ZKzE",
-    "username" : "akkka"
-}
 
 ###
 
@@ -212,3 +210,64 @@ Content-Type: application/json
     "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFsYW4iLCJpYXQiOjE2MzUwODcyNTgsImV4cCI6MTYzNTA5NDQ1OH0.626bctB1-YE4grAynndhbE9cAZbWT6xIKejIRH4hiDE"
 }
 
+// groups operations
+
+###
+POST http://localhost:3000/api/conversations/getGroups
+Content-Type: application/json
+
+{
+    "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFsYW4iLCJpYXQiOjE2MzU1OTI0NTksImV4cCI6MTYzNTU5OTY1OX0.IeJvhMlcONCT2-Kf-ou87x4glpJul5V0iKW7sFeuzJs"
+}
+
+###
+POST http://localhost:3000/api/events/617be91deb1123ffd8f81e39/createEvent
+Content-Type: application/json
+
+{
+    "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFsYW4iLCJpYXQiOjE2MzU2MjU2MzIsImV4cCI6MTYzNTYzMjgzMn0.yMLUS1XRtiVzoNHKwb8ibw5noI-O3S8l0fZy1x212B4",
+    "name" : "SE LAB work",
+    "description" : "have to finish HERMES chat app",
+    "datetime" : "2021-10-11",
+    "roles" : ["CR","Everyone"]
+}
+###
+POST http://localhost:3000/api/events/617be91deb1123ffd8f81e39/deleteEvent
+Content-Type: application/json
+
+{
+    "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFsYW4iLCJpYXQiOjE2MzU2MjU2MzIsImV4cCI6MTYzNTYzMjgzMn0.yMLUS1XRtiVzoNHKwb8ibw5noI-O3S8l0fZy1x212B4",
+    "id" : "617dac0be4b0d0594e19a22c"
+}
+
+//view channels
+###
+POST http://localhost:3000/api/channels/617be91deb1123ffd8f81e39/viewAll
+Content-Type: application/json
+
+{
+    "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFsYW4iLCJpYXQiOjE2MzU3OTA0NDIsImV4cCI6MTYzNTc5NzY0Mn0.ziufyXR4hl4nwiDqhhJSRx33MkbXR6GeDJvRQxfFpfw"
+}
+
+//******************************************
+
+###
+//View all members
+POST http://localhost:3000/api/members/617be91deb1123ffd8f81e39/viewAll
+Content-Type: application/json
+
+{
+    "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFsYW4iLCJpYXQiOjE2MzU3OTQzNjgsImV4cCI6MTYzNTg2NjM2OH0.6Kf9gAVqsxulCJSWHsAQozpAU4_5boOy-CO0wsGcKhU"
+}
+
+###
+//Edit roles of member
+POST http://localhost:3000/api/members/617be91deb1123ffd8f81e39/editMemberRole
+Content-Type: application/json
+
+{
+    "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFsYW4iLCJpYXQiOjE2MzU3OTg5NTksImV4cCI6MTYzNTg3MDk1OX0.Lu4fPyy_peywkMhI1wUiUTf5DgDiOBlibDLKHMTvHyE",
+    "username" : "Alan",
+    "roles" : ["Admin","Everyone","headboy"]
+    
+}
