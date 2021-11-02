@@ -51,6 +51,10 @@ function hasRolePermission(toCheck){
                             var channel_perms = role['channelPermissions'].filter(function (channel) {
                                 return channel.chaName == req.body.chaName;
                             })
+                            if(!channel_perms || !channel_perms.length){
+                                continue
+                            }
+                            
                             console.log('line 54')
                             channel_perms = channel_perms[0]['permissions']
                             // console.log('line 56')
