@@ -23,12 +23,13 @@ router.post("/:id/viewAll", auth, isGroupMember, async (req, res) => {
         })
 
         res.status(200).json({message: `Members of ${res.group.name} fetched`, members: members, success: true})
-        
+      
     } catch(err){
 
         res.status(500).json({message: err.message, success: false})
     }
 })
+
 
 router.post(":id/addMember", auth, isGroupMember, hasPermission({
     category: "Group",
