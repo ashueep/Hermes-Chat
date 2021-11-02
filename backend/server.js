@@ -14,7 +14,11 @@ const fs = require('fs')
 
 // define the first route
 app.get("/", function (req, res) {
-    res.send("<h1>Hello World!</h1>")
+    res.send("<h1>From server.js!</h1>")
+})
+
+app.get("/Welcome", function (req, res) {
+    res.send("Welcome to Hermes")
 })
 
 mongoose.connect(process.env.DATABASE_URL)
