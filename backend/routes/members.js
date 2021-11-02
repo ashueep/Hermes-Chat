@@ -23,12 +23,13 @@ router.post("/:id/viewAll", auth, isGroupMember, async (req, res) => {
         })
 
         res.status(200).json({message: `Members of ${res.group.name} fetched`, members: members, success: true})
-        
+      
     } catch(err){
 
         res.status(500).json({message: err.message, success: false})
     }
 })
+
 
 router.post(":id/addMember", auth, isGroupMember, hasPermission({
     category: "Group",
@@ -44,7 +45,11 @@ router.post(":id/addMember", auth, isGroupMember, hasPermission({
             memberID: user_id,
             roles: ["Everyone"]
         })
+
+        user["groups"].push(req.params.id);
+
         const toSend = await res.group.save();
+        await user.save();
         res.status(200).json({message: "User added!", success: false, updated: toSend})
     } catch (error) {
         res.status(500).json({message: error.message, success: false})
@@ -58,7 +63,7 @@ router.post(":id/editMemberRole", auth, isGroupMember, hasPermission({
     try {
         const member = await User.findOne({username: req.body.username})
         const mem_id = member._id;
-        const ind = res.group["members"].indexOf(mem_id)
+        const ind = res.group["members"].findIndex(x => x["memberID"] == mem_id)
 
         if(req.body.roles.indexOf("Everyone") == -1)
             req.body.roles.push("Everyone");
@@ -79,8 +84,8 @@ router.post(":id/deleteMember", auth, isGroupMember, hasPermission({
     try {
         const member = await User.findOne({username: req.body.username})
         const mem_id = member._id;
-        const ind_mem = res.group["members"].indexOf(mem_id)
-        const ind_user = res.group["members"].indexOf(req.user._id)
+        const ind_mem = res.group["members"].findIndex(x => x["memberID"] == mem_id)
+        const ind_user = res.group["members"].indexOf(x => x["memberID"] == req.user._id)
         
         const mem_roles = res.group["members"][ind_mem]["roles"];
         const user_roles = res.group["members"][ind_user]["roles"];
@@ -94,8 +99,10 @@ router.post(":id/deleteMember", auth, isGroupMember, hasPermission({
         }
 
         res.group["members"] = res.group["members"].filter(x => x["memberID"] != mem_id)
+        member["groups"] = member["groups"].filter(x => x != res.group._id)
 
         const savedGroup = await res.group.save();
+        const savedUser = await member.save();
         res.status(200).json({message: "Member removed from group!", success: false})
     } catch (error) {
         res.status(500).json({message: error.message, success: false})

@@ -7,6 +7,7 @@ const http = require('http').createServer(app)
 const io = require('socket.io')(http, { cors : { origin : "*" } });
 const message = require('./models/message.model');
 const DM = require('./models/dm.model')
+const conversation = require('./models/conversation.model')
 const user = require('./models/users.model');
 const https = require('https')
 const fs = require('fs')
@@ -42,6 +43,10 @@ app.use('/api/members/', members)
 const dm = require('./routes/dms')
 app.use('/api/dms/', dm)
 
+
+const members = require('./routes/members')
+app.use('/api/members/', members)
+
 var https_options = {
     key: fs.readFileSync('./security/cert.key'),
     cert: fs.readFileSync('./security/cert.pem')
@@ -61,6 +66,32 @@ const insert = async (sender, body, room, timestamp) => {
     await dm.save()
 }
 
+const insertChan = async (sender, body, room, timestamp) => {
+    const grp = room.split('-')
+    const convo = await conversation.findById(grp[0]);
+
+    const senderID = await user.findOne({ username : sender })
+
+    console.log('mongo query', room, sender)
+
+    const newmess = new message({
+        senderID: senderID._id,
+        body: body,
+        timeStamp: timestamp,
+    })
+    const mess = await newmess.save();
+
+    for(var i = 0 ; i < convo['channels'].length ; i++){
+        if(convo['channels'][i]['name'] == grp[1]){
+            convo['channels'][i]['messages'].push(mess._id);
+            await convo.save();
+            return;
+        }
+    }
+
+
+}
+
 try {
     io.on('connection', socket => {
         console.log('connected socket', socket.id)
@@ -68,6 +99,29 @@ try {
             socket.join(dmid['dmid']);
             console.log('connectDM', dmid)
         })
+
+        socket.on('connectChan', (room) => {
+            socket.join(room['room']);
+            console.log(room)
+        })
+
+        socket.on('sendChan', message => {
+            console.log("hello grp")
+            room = message.room
+            sender = message.sender
+            text = message.text
+            console.log(room)
+            const time = Date.now()
+
+            insertChan(sender, text, room, time)
+
+            socket.to(room).emit('recvChan', {
+                senderID: sender,
+                body: text,
+                timestamp: time
+            })
+        })
+
         socket.on('sendDM', message => {
             console.log("hello")
             room = message.room
@@ -86,7 +140,7 @@ try {
 
         })
         socket.on('disconnect', () => {
-            socket.leave(chatID);
+            console.log('removing user')
         })
     })
 } catch (err) {
