@@ -12,17 +12,17 @@ const user = require('./models/users.model');
 const https = require('https')
 const fs = require('fs')
 
+// define the first route
+app.get("/", function (req, res) {
+    res.send("<h1>Hello World!</h1>")
+})
+
 mongoose.connect(process.env.DATABASE_URL)
 const db = mongoose.connection
 db.on('error', (error) => console.log(error))
 db.once('open', () => console.log('Connected to database'))
 
 app.use(express.json())
-
-// define the first route
-app.get("/", function (req, res) {
-    res.send("<h1>Hello World!</h1>")
-})
 
 const userRouter = require('./routes/userService')
 app.use('/api/userService/', userRouter)
