@@ -14,17 +14,21 @@ const fs = require('fs')
 
 // define the first route
 app.get("/", function (req, res) {
-    res.send("<h1>From server.js!</h1>")
-})
-
-app.get("/Welcome", function (req, res) {
     res.send("Welcome to Hermes")
 })
 
-mongoose.connect(process.env.DATABASE_URL)
-const db = mongoose.connection
-db.on('error', (error) => console.log(error))
-db.once('open', () => console.log('Connected to database'))
+try{
+
+    mongoose.connect(process.env.DATABASE_URL)
+    const db = mongoose.connection
+    db.once('open', () => console.log('Connected to database'))
+    db.on('error', (error) => console.log(error))
+
+} catch (err){
+
+    console.log(err.message)
+}
+
 
 app.use(express.json())
 
