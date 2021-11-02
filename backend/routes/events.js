@@ -79,9 +79,9 @@ router.post('/:id/createEvent', auth, isGroupMember, hasPermission({
                 name: req.body.name,
                 datetime: req.body.datetime,
                 description: req.body.description,
-                attendees: []
+                attendees: ["Everyone"]
             })
-            const updatedConvo = await group.save()
+            const updatedConvo = await res.group.save()
             res.json({"result": updatedConvo, message: `Event "${req.body.name}" created!`, success: true})
         }
 
