@@ -84,12 +84,9 @@ router.post("/:id/deleteMember", auth, isGroupMember, hasPermission({
     try {
         const member = await User.findOne({username: req.body.username})
         const mem_id = member._id;
-        console.log(mem_id.toString())
-
         const ind_mem = res.group["members"].findIndex(x => x["memberID"].toString() == mem_id.toString())
-
         const ind_user = res.group["members"].findIndex(x => x["memberID"].toString() == res.user._id.toString())
-        console.log("1")
+        
         const mem_roles = res.group["members"][ind_mem]["roles"];
         const user_roles = res.group["members"][ind_user]["roles"];
 
@@ -100,7 +97,6 @@ router.post("/:id/deleteMember", auth, isGroupMember, hasPermission({
         if(mem_roles.includes("Admin") && !user_roles.includes("Admin")){
             return res.status(400).json({message: "Cannot remove Admin unless you have an Admin role", success: false})
         }
-        console.log("2")
         res.group["members"] = res.group["members"].filter(x => x["memberID"].toString() != mem_id.toString())
         member["groups"] = member["groups"].filter(x => x.toString() != res.group._id.toString())
 

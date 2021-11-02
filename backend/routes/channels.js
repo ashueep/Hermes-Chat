@@ -9,6 +9,7 @@ const conversation = require('../models/conversation.model')
 // const message = require('../models/message.model')
 // const User = require('../models/users.model')
 const hasPermission = require('../middleware/hasPermission')
+const { route } = require('./dms')
 
 
 const hasPermissionBool = async (toCheck) => {
@@ -135,6 +136,7 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
             //allroles = ["Faculty", "Admin", "Student"]
             //1: roles = "Faculty"
             //2: roles = "Admin"
+            if(!allroles.includes("Admin")) allroles.push("Admin");
             
             res.group['roles'].forEach(role => {
 
@@ -157,6 +159,8 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
         if(req.body.write != null){
             console.log('in this other statement')
             var allroles = req.body.write
+            if(!allroles.includes("Admin")) allroles.push("Admin");
+
             //allroles = ["Faculty", "Admin"]
             //1: roles = "Faculty"
             //2: roles = "Admin"
@@ -179,6 +183,8 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
         if(req.body.edit != null){
             console.log('in this other statement')
             var allroles = req.body.edit
+            if(!allroles.includes("Admin")) allroles.push("Admin");
+
             //allroles = ["Faculty", "Admin"]
             //1: roles = "Faculty"
             //2: roles = "Admin"
@@ -201,6 +207,8 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
         if(req.body.delete != null){
             console.log('in this other statement')
             var allroles = req.body.delete
+            if(!allroles.includes("Admin")) allroles.push("Admin");
+
             //allroles = ["Faculty", "Admin"]
             //1: roles = "Faculty"
             //2: roles = "Admin"
@@ -330,7 +338,7 @@ router.post('/:id/deleteChannel', auth, isGroupMember, hasPermission({
         }
 
         if(req.body.chaName == 'general'){
-            res.status(400).json({message: "cannot delete general channel"})
+            res.status(400).json({message: "cannot delete general channel", success: false})
             return;
         }
 
@@ -347,7 +355,7 @@ router.post('/:id/deleteChannel', auth, isGroupMember, hasPermission({
 
         //Remove channel from channel permissions of roles before removing the channel itself
         res.group['roles'].forEach(role => {
-            if(role['channelPermissions'].some(arrVal => arrVal['chaName'] == chnName)){
+            if(role['channelPermissions'].some(arrVal => arrVal['chaName'] == chaName)){
                 role['channelPermissions'] = role['channelPermissions'].filter(x => x['chaName'] != chaName)
             }
         })
@@ -499,7 +507,29 @@ function editChannel(allroles, role, perm, checkname){
     return role;
 }
 
+router.post(":id/sendAllRolesForChannel/", auth, isGroupMember, async (req, res) =>{
+    try {
+        var channels_list = [];
+        res.group["channels"].forEach(channel => {
+            channels_list.push(channel.name);
+        })
 
+        var roles_in_chan = {};
+
+        channels_list.forEach(chaName => {
+            roles_in_chan[chaName] = [];
+            res.group["roles"].forEach(role => {
+                var list_chans = role["channelPermissions"];
+                if(list_chans.some(x => x["chaName"] == chaName)) roles_in_chan[chaName].push(role.name);
+            })
+        })
+
+        res.status(200).json({roles_in_chan})
+
+    } catch (error) {
+        res.status(500).json({message: error.message, success: false})
+    }
+})
 
 
 module.exports = router
