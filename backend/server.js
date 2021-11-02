@@ -19,6 +19,11 @@ db.once('open', () => console.log('Connected to database'))
 
 app.use(express.json())
 
+// define the first route
+app.get("/", function (req, res) {
+    res.send("<h1>Hello World!</h1>")
+})
+
 const userRouter = require('./routes/userService')
 app.use('/api/userService/', userRouter)
 
