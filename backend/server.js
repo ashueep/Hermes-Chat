@@ -12,6 +12,9 @@ const user = require('./models/users.model');
 const https = require('https')
 const fs = require('fs')
 
+const HTTP_PORT = process.env.PORT || 3000
+//const HTTPS_PORT = process.env.HTTPS_PORT || 3001
+
 // define the first route
 app.get("/", function (req, res) {
     res.send("Welcome to Hermes")
@@ -157,24 +160,25 @@ try {
     console.log(err)
 }
 
-//app.listen(parseInt(process.env.PORT), () => console.log("Server Started"))
-const httpServer = http.listen(process.env.HTTP_PORT, (err) => {
+const httpServer = http.listen(HTTP_PORT, (err) => {
     
     if(err){
         console.log(err.message)
         return
     }
-    console.log(`HTTP Server Started at http://localhost:${process.env.HTTP_PORT}/`)
+    console.log(`HTTP Server Started at port ${HTTP_PORT}/`)
 })
 
-const httpsServer = https.createServer(https_options, app).listen(process.env.HTTPS_PORT, (err) => {
+/*
+const httpsServer = https.createServer(https_options, app).listen(HTTPS_PORT, (err) => {
     
     if(err){
         console.log(err.message)
         return
     }
-    console.log("HTTPS Server Started")
+    console.log(`HTTPS Server Started at http://localhost:${HTTPS_PORT}/`)
 })
+*/
 
 module.exports = {
     http: httpServer,
