@@ -180,7 +180,4 @@ const httpsServer = https.createServer(https_options, app).listen(HTTPS_PORT, (e
 })
 */
 
-module.exports = {
-    http: httpServer,
-    https: httpsServer
-}
+module.exports = httpServer

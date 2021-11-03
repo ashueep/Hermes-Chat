@@ -1,4 +1,4 @@
-const { http, _ } = require('./server');
+const http = require('./server');
 const io = require('socket.io')(http);
 const message = require('./models/message.model');
 const DM = require('./models/dm.model')
