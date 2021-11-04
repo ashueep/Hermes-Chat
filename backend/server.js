@@ -15,7 +15,7 @@ const fs = require('fs')
 const HTTP_PORT = process.env.PORT || 3000
 //const HTTPS_PORT = process.env.HTTPS_PORT || 3001
 
-// define the first route
+// Define the first route
 app.get("/", function (req, res) {
     res.send("Welcome to Hermes")
 })
