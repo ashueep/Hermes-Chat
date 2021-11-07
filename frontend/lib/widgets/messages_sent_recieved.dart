@@ -55,7 +55,7 @@ class chats_received_sent extends StatelessWidget {
                           CircleAvatar(
                             radius: 35.0,
                             backgroundImage:
-                                AssetImage('assets/images/greg.jpg.png'),
+                                AssetImage('assets/images/group.jpg.png'),
                           ),
                           SizedBox(width: 10.0),
                           Column(

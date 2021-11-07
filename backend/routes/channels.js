@@ -138,7 +138,7 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
         }, {
             $unwind: "$members"
         }, {
-            $match: {'members.memberID': mongoose.Types.ObjectId(req_user_id)}
+            $match: {'members.memberID': mongoose.Types.ObjectId(res.user._id.toString())}
         }, {
             $project: {
                 roles: "$members.roles" 
@@ -526,7 +526,7 @@ function editChannel(allroles, role, perm, checkname){
         if(role['channelPermissions'].some(arrVal => arrVal['chaName'] == checkname)){
             var ind = role['channelPermissions'].findIndex(arrVal => arrVal['chaName'] == checkname)
             if(ind !== -1){
-                if (perm in [2, 3,4] && !role['channelPermissions'][ind]['permissions'].includes(1)){
+                if ([2,3,4].includes(perm) && !role['channelPermissions'][ind]['permissions'].includes(1)){
                     role['channelPermissions'][ind]['permissions'].push(1);
                 }
                 if (!role['channelPermissions'][ind]['permissions'].includes(perm)){

@@ -1,17 +1,25 @@
+import 'package:chat_app_project/group_requests/sending_edit_role_permissions.dart';
+import 'package:chat_app_project/models/Groups_class_final.dart';
+import 'package:chat_app_project/pages/show_roles.dart';
 import 'package:chat_app_project/widgets/List_of_roles.dart';
 import 'package:chat_app_project/widgets/permisssion_for_a_particular_role.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class edit_roles_and_permissions extends StatefulWidget {
-  const edit_roles_and_permissions({Key? key}) : super(key: key);
+  int g_index;
+  int role_index;
+  edit_roles_and_permissions({required this.g_index,required this.role_index});
 
   @override
-  _edit_roles_and_permissionsState createState() => _edit_roles_and_permissionsState();
+  _edit_roles_and_permissionsState createState() => _edit_roles_and_permissionsState(g_index: g_index,role_index: role_index);
 }
 
 class _edit_roles_and_permissionsState extends State<edit_roles_and_permissions> {
   int curr_index=0;
+  int g_index;
+  int role_index;
+  _edit_roles_and_permissionsState({required this.g_index,required this.role_index});
   void _showDialog_for_login_failure(BuildContext context,String message) {
     showDialog(
       context: context,
@@ -43,22 +51,24 @@ class _edit_roles_and_permissionsState extends State<edit_roles_and_permissions>
     }
 
     return Scaffold(
-      //floatingActionButton: FloatingActionButton(
-      //  onPressed: () {
-      //   Navigator.push(context,
-      //        MaterialPageRoute(builder: (context) => create_new_account()));
-      //  },
-      //  child: const Icon(Icons.add_circle_outline_sharp),
-      //),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.orange,
-        onTap: onTabTapped,
-        currentIndex: curr_index,
-        items: [BottomNavigationBarItem(icon: Icon(Icons.add_box_outlined), label: "CONFIRM CHANGES"),
-          BottomNavigationBarItem(icon: Icon(Icons.arrow_back_ios_new_outlined), label: "RETURN"),
-        ],
-
+      floatingActionButton: FloatingActionButton(
+       onPressed: () async {
+         List<String> response_from_API = await send_edited_permissions_for_role(list_of_groups[g_index].all_roles[role_index].role_name, value1, list_of_groups[g_index].group_id);
+        Navigator.push(context,
+             MaterialPageRoute(builder: (context) => show_roles(g_index: g_index,)));
+       },
+       child: const Icon(Icons.arrow_forward_ios_outlined),
       ),
+      // bottomNavigationBar: BottomNavigationBar(
+      //   backgroundColor: Colors.orange,
+      //   onTap: onTabTapped,
+      //   currentIndex: curr_index,
+      //   items: [BottomNavigationBarItem(icon: Icon(Icons.add_box_outlined), label: "CONFIRM CHANGES"),
+      //     BottomNavigationBarItem(icon: Icon(Icons.arrow_back_ios_new_outlined), label: "RETURN"),
+      //   ],
+      //
+      // ),
+
       backgroundColor: Colors.red,
       appBar: AppBar(
         centerTitle: true,
@@ -99,7 +109,7 @@ class _edit_roles_and_permissionsState extends State<edit_roles_and_permissions>
               child: Column(
                 children: <Widget>[
 
-                  permission_for_a_particular_role(),
+                  permission_for_a_particular_role(g_index: g_index,role_index: role_index,),
 
                 ],
               ),

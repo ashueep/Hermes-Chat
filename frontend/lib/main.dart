@@ -10,7 +10,7 @@ class Chat_app extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "chatvapp UI",
+      title: "chatapp UI",
       theme: ThemeData(
         primaryColor: Colors.red,
       ),

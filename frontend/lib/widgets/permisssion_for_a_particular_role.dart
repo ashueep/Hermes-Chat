@@ -1,4 +1,5 @@
 import 'package:chat_app_project/models/Groups.dart';
+import 'package:chat_app_project/models/Groups_class_final.dart';
 import 'package:chat_app_project/models/Sending_login_credentials_to_API.dart';
 import 'package:chat_app_project/models/message_model.dart';
 import 'package:chat_app_project/pages/Groups_Page.dart';
@@ -7,19 +8,35 @@ import 'package:chat_app_project/pages/edit_roles_and_permissions.dart';
 import 'package:chat_app_project/pages/group_channels.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
-
+List<bool> value1=[];
 class permission_for_a_particular_role extends StatefulWidget {
+  int g_index;
+  int role_index;
+  permission_for_a_particular_role({required this.g_index, required this.role_index});
+
   @override
-  State<permission_for_a_particular_role> createState() => _permission_for_a_particular_roleState();
+  State<permission_for_a_particular_role> createState() => _permission_for_a_particular_roleState(g_index: g_index,role_index: role_index);
 }
 
 class _permission_for_a_particular_roleState extends State<permission_for_a_particular_role> {
   @override
+  int g_index;
+  int role_index;
+  _permission_for_a_particular_roleState({required this.g_index, required this.role_index});
+
+  void initState()
+  {
+    value1=[list_of_groups[g_index].all_roles[role_index].group_permissions_for_role.add_channel,
+    list_of_groups[g_index].all_roles[role_index].group_permissions_for_role.add_modify_delete_roles,
+      list_of_groups[g_index].all_roles[role_index].group_permissions_for_role.add_remove_members,
+      list_of_groups[g_index].all_roles[role_index].group_permissions_for_role.add_edit_delete_events,
+      list_of_groups[g_index].all_roles[role_index].group_permissions_for_role.delete_group,
+    ];
+    super.initState();
+  }
   List<String> roles=["Teacher","Student","Principal","Administrator"];
 
-  List<String> permissions=["Edit Group Name","Delete Group","Add channels","add/modify/delete roles","add/remove members","Add/edit/delete events"];
-
-  List<bool> value1=[false,false,false,false,false,false];
+  List<String> permissions=["add channels","add/modify/delete roles","add/remove members","Add/edit/delete events","edit/Delete group"];
 
   bool value=false;
 
@@ -144,7 +161,9 @@ class _permission_for_a_particular_roleState extends State<permission_for_a_part
                           Checkbox(value: value1[k],
                             onChanged: (value) {
                               setState(() {
-                                value1[k] = value!;
+                                if(list_of_groups[g_index].all_roles[role_index].role_name!="Admin" && list_of_groups[g_index].all_roles[role_index].role_name!="Everyone") {
+                                  value1[k] = value!;
+                                }
                               });
                             },
                           ),

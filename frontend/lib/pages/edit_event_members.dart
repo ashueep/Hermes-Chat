@@ -1,22 +1,51 @@
+import 'dart:math';
+
+import 'package:chat_app_project/models/Groups_class_final.dart';
+import 'package:chat_app_project/pages/group_channels.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'Groups_Page.dart';
 
+List<bool> bool_for_roles_part_of_event=[];
+
 class edit_event_members extends StatefulWidget {
-  const edit_event_members({Key? key}) : super(key: key);
+  int g_index;
+  int event_index;
+  edit_event_members({required this.g_index,required this.event_index});
 
   @override
-  _edit_event_membersState createState() => _edit_event_membersState();
+  _edit_event_membersState createState() => _edit_event_membersState(g_index: g_index,event_index: event_index);
 }
 
 class _edit_event_membersState extends State<edit_event_members> {
   @override
-  List<String> roles=["Teacher","Student","Principal","Administrator"];
+  int g_index;
+  int event_index;
+  _edit_event_membersState({required this.g_index,required this.event_index});
+  //List<String> roles=["Teacher","Student","Principal","Administrator"];
 
   //List<String> permissions=["Edit Group Name","Delete Group","Add channels","add/modify/delete roles","add/remove members","Add/edit/delete events"];
 
-  List<bool> value1=[false,false,false,false,false,false];
+  void initState(){
+    bool_for_roles_part_of_event=[];
+    for(int k=0;k<list_of_groups[g_index].all_roles.length;k++)
+      {
+        bool_for_roles_part_of_event.add(false);
+      }
+
+    for(int i=0;i<list_of_groups[g_index].all_roles.length;i++)
+      {
+        for(int j=0;j<list_of_groups[g_index].events_that_group_member_is_part_of[event_index].roles.length;j++)
+          {
+            if(list_of_groups[g_index].all_roles[i].role_name.toString() == list_of_groups[g_index].events_that_group_member_is_part_of[event_index].roles[j])
+              {
+                bool_for_roles_part_of_event[i]=true;
+              }
+          }
+      }
+    super.initState();
+  }
 
   bool value=false;
 
@@ -68,7 +97,7 @@ class _edit_event_membersState extends State<edit_event_members> {
             ),
             new FlatButton(
                 onPressed: () {Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Group_Page()));},
+                    MaterialPageRoute(builder: (context) => group_channels(index: g_index,)));},
                 child: new Text("YES"))
           ],
         );
@@ -77,6 +106,13 @@ class _edit_event_membersState extends State<edit_event_members> {
   }
 
   Widget build(BuildContext context) {
+
+    Color _choose_random_color(){
+      Random random = new Random();
+      int randomNumber = random.nextInt(6) + 0;
+      return colors[randomNumber];
+    }
+
     return Expanded(
       child: Container(
         height: 278.0, //just used to test
@@ -93,7 +129,7 @@ class _edit_event_membersState extends State<edit_event_members> {
             topRight: Radius.circular(28.0),
           ),
           child: ListView.builder(
-            itemCount: roles.length,
+            itemCount: list_of_groups[g_index].all_roles.length,
             itemBuilder: (BuildContext context, int k) {
               return GestureDetector(
                 onTap: () {print("role pressed");},
@@ -106,7 +142,7 @@ class _edit_event_membersState extends State<edit_event_members> {
                   padding:
                   EdgeInsets.symmetric(horizontal: 7.5, vertical: 10.0),
                   decoration: BoxDecoration(
-                      color: colors[k],
+                      color: _choose_random_color(),
                       borderRadius: BorderRadius.only(
                         topRight: Radius.circular(20.0),
                         bottomRight: Radius.circular(20.0),
@@ -123,7 +159,7 @@ class _edit_event_membersState extends State<edit_event_members> {
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.50,
                                 child: Text(
-                                  roles[k],
+                                  list_of_groups[g_index].all_roles[k].role_name,
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 20.0,
@@ -138,10 +174,10 @@ class _edit_event_membersState extends State<edit_event_members> {
                       ),
                       Column(
                         children: <Widget>[
-                          Checkbox(value: value1[k],
+                          Checkbox(value: bool_for_roles_part_of_event[k],
                             onChanged: (value) {
                               setState(() {
-                                value1[k] = value!;
+                                bool_for_roles_part_of_event[k] = value!;
                               });
                             },
                           ),
