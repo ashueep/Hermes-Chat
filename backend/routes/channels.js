@@ -285,7 +285,8 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
             else checkname = oldname;
             var allroles = req.body.view;
             res.group['roles'].forEach(role => {
-                role = editChannel(allroles, role, reqJSON.view, checkname);
+                if(role.name != "Admin")
+                    role = editChannel(allroles, role, reqJSON.view, checkname);
             })
         }
         if(req.body.write != null){
@@ -294,7 +295,8 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
             else checkname = oldname;
             var allroles = req.body.write;
             res.group['roles'].forEach(role => {
-                role = editChannel(allroles, role, reqJSON.write, checkname);
+                if(role.name != "Admin")
+                    role = editChannel(allroles, role, reqJSON.write, checkname);
             })
         }
         if(req.body.edit != null){
@@ -303,7 +305,8 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
             else checkname = oldname;
             var allroles = req.body.edit;
             res.group['roles'].forEach(role => {
-                role = editChannel(allroles, role, reqJSON.edit, checkname);
+                if(role.name != "Admin")
+                    role = editChannel(allroles, role, reqJSON.edit, checkname);
             })
         }
         if(req.body.delete != null){
@@ -312,7 +315,8 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
             else checkname = oldname;
             var allroles = req.body.delete;
             res.group['roles'].forEach(role => {
-                role = editChannel(allroles, role, reqJSON.delete, checkname);
+                if(role.name != "Admin")
+                    role = editChannel(allroles, role, reqJSON.delete, checkname);
             })
         }
         
