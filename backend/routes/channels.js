@@ -511,7 +511,7 @@ function editChannel(allroles, role, perm, checkname){
     return role;
 }
 
-router.post(":id/sendAllRolesForChannel/", auth, isGroupMember, async (req, res) =>{
+router.post("/:id/sendAllRolesForChannel/", auth, isGroupMember, async (req, res) =>{
     try {
         var channels_list = [];
         res.group["channels"].forEach(channel => {
@@ -535,5 +535,68 @@ router.post(":id/sendAllRolesForChannel/", auth, isGroupMember, async (req, res)
     }
 })
 
+router.post("/:id/getChannelPermissions/", auth, isGroupMember, async (req, res) =>{
+
+    try {
+    
+        if(!req.body.chaName){
+
+            return res.status(400).json({message: "Name of channel missing", success: false})
+        }
+
+        var index = res.group['channels'].findIndex(chan => chan['name'] == req.body.chaName);
+        if(index == -1){
+
+            return res.status(404).json({message: "Channel does not exist", success: false});;
+        }
+
+        let perm_num
+        if(req.body.perm){
+
+            if(req.body.perm == "view")
+                perm_num = 1
+            else if(req.body.perm == "write")
+                perm_num = 2
+            else if(req.body.perm == "edit")
+                perm_num = 3
+            else if(req.body.perm == "delete")
+                perm_num = 4
+        }
+
+        if(!perm_num){
+
+            res.status(400).json({message: "Did not specify permission or specified an invalid one", success: false})
+        }
+
+        //Create list of json objects of the format:
+        //{rolename: "RandomRole", perm: true/false}
+        let permissions = []
+        let chaPerm
+        for(let role of res.group.roles){
+
+            chaPerm = role.channelPermissions.find(some_chaPerm => some_chaPerm.chaName == req.body.chaName)
+
+            if(!chaPerm){
+
+                permissions.push({rolename: role.name, perm: false})
+            }
+            else{
+
+                if(chaPerm.permissions.includes(perm_num)){
+                    permissions.push({rolename: role.name, perm: true})
+                }
+                else{
+                    permissions.push({rolename: role.name, perm: false})
+                }
+            }
+        }
+        
+        res.status(200).json({message: "Channel permissions fetched", permissions: permissions, success: true})
+
+    } catch(err){
+
+        res.status(500).json({message: error.message, success: false})
+    }
+})
 
 module.exports = router
