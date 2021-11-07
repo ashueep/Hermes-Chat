@@ -184,7 +184,7 @@ router.post('/create/', auth, async (req, res) => {
         await res.user.save()
         console.log(convo)
         const toSend = await convo.save();
-        res.status(201).json({group: toSend, message: "Group has been created successfully", created: true})
+        res.status(201).json({group: toSend, message: "Group has been created successfully", success: true})
 
     } catch(err) {
         res.status(500).json(err)
