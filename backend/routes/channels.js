@@ -124,7 +124,7 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
         }
         
         if(res.group['channels'].some(x => x['name'] == req.body.chaName)){
-            res.status(400).json({message: "channel already exists"});
+            res.status(400).json({message: "channel already exists", success: false});
             return;
         }
         
@@ -133,9 +133,42 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
             messages: [],
         })
 
-        if(req.body.view != null){
+        var memberx = await conversation.aggregate([{
+            $match: {'_id':  mongoose.Types.ObjectId(req.params.id)}
+        }, {
+            $unwind: "$members"
+        }, {
+            $match: {'members.memberID': mongoose.Types.ObjectId(req_user_id)}
+        }, {
+            $project: {
+                roles: "$members.roles" 
+            }
+        }])
+        // console.log(memberx)
+
+        userRoles = memberx[0]['roles'];
+        var roleArr = [];
+
+        res.group["roles"].forEach(role => {
+            if(userRoles.includes(role.name) && role["groupPermissions"].includes(1)){
+                roleArr.push(role.name);
+            }
+        })
+
+        if(!roleArr.includes("Admin")) roleArr.push("Admin")
+
+        var roleJSON = {
+            "view": roleArr,
+            "write": roleArr,
+            "edit": roleArr,
+            "delete": roleArr
+        }
+        
+
+
+        if(roleJSON.view != null){
             console.log('in this1 statement')
-            var allroles = req.body.view
+            var allroles = roleJSON.view
             //allroles = ["Faculty", "Admin", "Student"]
             //1: roles = "Faculty"
             //2: roles = "Admin"
@@ -159,9 +192,9 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
             })
         }
 
-        if(req.body.write != null){
+        if(roleJSON.write != null){
             console.log('in this other statement')
-            var allroles = req.body.write
+            var allroles = roleJSON.write
             if(!allroles.includes("Admin")) allroles.push("Admin");
 
             //allroles = ["Faculty", "Admin"]
@@ -183,9 +216,9 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
             })
         }
 
-        if(req.body.edit != null){
+        if(roleJSON.edit != null){
             console.log('in this other statement')
-            var allroles = req.body.edit
+            var allroles = roleJSON.edit
             if(!allroles.includes("Admin")) allroles.push("Admin");
 
             //allroles = ["Faculty", "Admin"]
@@ -207,9 +240,9 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
             })
         }
 
-        if(req.body.delete != null){
+        if(roleJSON.delete != null){
             console.log('in this other statement')
-            var allroles = req.body.delete
+            var allroles = roleJSON.delete
             if(!allroles.includes("Admin")) allroles.push("Admin");
 
             //allroles = ["Faculty", "Admin"]
@@ -230,6 +263,8 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
                 }
             })
         }
+
+        
 
         await res.group.save()
         res.status(200).json({message: `Channel ${req.body.chaName} created`, success: true})
@@ -254,7 +289,7 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
         var oldname = req.body.chaName;
 
         if(req.body.chaName == 'general'){
-            res.status(400).json({message: "cannot modify general channel"})
+            res.status(400).json({message: "cannot modify general channel", success: false})
             return;
         }
 
@@ -288,7 +323,8 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
             else checkname = oldname;
             var allroles = req.body.view;
             res.group['roles'].forEach(role => {
-                role = editChannel(allroles, role, reqJSON.view, checkname);
+                if(role.name != "Admin")
+                    role = editChannel(allroles, role, reqJSON.view, checkname);
             })
         }
         if(req.body.write != null){
@@ -297,7 +333,8 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
             else checkname = oldname;
             var allroles = req.body.write;
             res.group['roles'].forEach(role => {
-                role = editChannel(allroles, role, reqJSON.write, checkname);
+                if(role.name != "Admin")
+                    role = editChannel(allroles, role, reqJSON.write, checkname);
             })
         }
         if(req.body.edit != null){
@@ -306,7 +343,8 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
             else checkname = oldname;
             var allroles = req.body.edit;
             res.group['roles'].forEach(role => {
-                role = editChannel(allroles, role, reqJSON.edit, checkname);
+                if(role.name != "Admin")
+                    role = editChannel(allroles, role, reqJSON.edit, checkname);
             })
         }
         if(req.body.delete != null){
@@ -315,7 +353,8 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
             else checkname = oldname;
             var allroles = req.body.delete;
             res.group['roles'].forEach(role => {
-                role = editChannel(allroles, role, reqJSON.delete, checkname);
+                if(role.name != "Admin")
+                    role = editChannel(allroles, role, reqJSON.delete, checkname);
             })
         }
         
@@ -372,7 +411,7 @@ router.post('/:id/deleteChannel', auth, isGroupMember, hasPermission({
             {safe: true}
         );
         
-        res.status(200).json({message: `Deleted channel ${req.body.chaName}`, success: false})
+        res.status(200).json({message: `Deleted channel ${req.body.chaName}`, success: true})
         
     } catch (err) {
         console.log(err)
