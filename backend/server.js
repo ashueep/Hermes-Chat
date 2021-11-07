@@ -77,7 +77,7 @@ const insertChan = async (sender, body, room, timestamp) => {
         timeStamp: timestamp,
     })
     const mess = await newmess.save();
-
+    console.log("insertChan",mess)
     for(var i = 0 ; i < convo['channels'].length ; i++){
         if(convo['channels'][i]['name'] == grp[1]){
             convo['channels'][i]['messages'].push(mess._id);
@@ -107,7 +107,7 @@ try {
             room = message.room
             sender = message.sender
             text = message.text
-            console.log(room)
+            console.log(room,message)
             const time = Date.now()
 
             insertChan(sender, text, room, time)
@@ -129,7 +129,7 @@ try {
 
             insert(sender, text, room, time)
 
-            socket.to(room).emit('recvDM', {
+            socket.in(room).emit('recvDM', {
                 senderID: sender,
                 body: text,
                 timestamp: time

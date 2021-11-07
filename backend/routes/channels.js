@@ -42,7 +42,7 @@ const hasPermissionBool = async (toCheck) => {
     } else {
 
         var perms = new Set()
-        convo['roles'].forEach(role => {
+        for( role of convo['roles'] ){
             
             if(userRoles.includes(role.name)){ 
 
@@ -54,6 +54,9 @@ const hasPermissionBool = async (toCheck) => {
                     var channel_perms = role['channelPermissions'].filter(function (channel) {
                         return channel.chaName == chaName;
                     })
+                    if(!channel_perms | !channel_perms.length){
+                        continue
+                    }
                     channel_perms = channel_perms[0]['permissions']
                     //console.log(channel_perms)
                     channel_perms.forEach(cperm => perms.add(cperm))
@@ -65,7 +68,7 @@ const hasPermissionBool = async (toCheck) => {
                     return false;
                 }
             }
-        })
+        }
 
         //console.log('perms', perms)
         if( perms.has(valPerm) == false ) {
@@ -507,7 +510,7 @@ function editChannel(allroles, role, perm, checkname){
     return role;
 }
 
-router.post(":id/sendAllRolesForChannel/", auth, isGroupMember, async (req, res) =>{
+router.post("/:id/sendAllRolesForChannel/", auth, isGroupMember, async (req, res) =>{
     try {
         var channels_list = [];
         res.group["channels"].forEach(channel => {
