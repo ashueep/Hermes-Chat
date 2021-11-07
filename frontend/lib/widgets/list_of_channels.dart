@@ -1,32 +1,38 @@
+import 'package:chat_app_project/global_variables.dart';
+import 'package:chat_app_project/group_member_requests/receive_all_roles_part_of_channel.dart';
+import 'package:chat_app_project/group_requests/create_new_channel.dart';
 import 'package:chat_app_project/models/Groups.dart';
+import 'package:chat_app_project/models/Groups_class_final.dart';
 import 'package:chat_app_project/models/channels.dart';
 import 'package:chat_app_project/models/dm_model.dart';
+import 'package:chat_app_project/models/get_all_channel_messages.dart';
 import 'package:chat_app_project/models/message_model.dart';
+import 'package:chat_app_project/pages/Channel_chat_window.dart';
 import 'package:chat_app_project/pages/Groups_Page.dart';
+import 'package:chat_app_project/pages/User_dashboard.dart';
+import 'package:chat_app_project/pages/add_channel_permissions_for_new_role_page.dart';
 import 'package:chat_app_project/pages/chat_window.dart';
 import 'package:chat_app_project/pages/group_channels.dart';
 import 'package:flutter/material.dart';
 
 class list_of_channels extends StatelessWidget {
-  final List<CHANNELS> channels;
-  list_of_channels({required this.channels});
-  void _showDialog_for_confirm_delete_account(BuildContext context) {
+  int index;
+  list_of_channels({required this.index});
+  void _showDialog_for_confirm_delete_account(BuildContext context,String text) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: new Text("Alert!"),
-          content: new Text("Are you sure you want to delete this group?"),
+          content: new Text("$text"),
           actions: <Widget>[
             new FlatButton(
-              child: new Text("CANCEL"),
+              child: new Text("OK"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
-            new FlatButton(
-                onPressed: () {print("Deleting the channel is requested");},
-                child: new Text("YES"))
+
           ],
         );
       },
@@ -50,14 +56,15 @@ class list_of_channels extends StatelessWidget {
             topRight: Radius.circular(28.0),
           ),
           child: ListView.builder(
-            itemCount: channels.length,
+            itemCount: list_of_groups[index].channels_group_member_is_part_of.length,
             itemBuilder: (BuildContext context, int k) {
               return GestureDetector(
-                onTap: () =>
+                onTap: () async {
+                  List<String> response_from_API = await fetch_channel_List(jwt_token, list_of_groups[index].group_id, list_of_groups[index].channels_group_member_is_part_of[k].channel_name.toString(), index, k);
                      Navigator.push(
                      context,
                      MaterialPageRoute(
-                         builder: (_) => Chat_Window(iter: k,full_name: list_of_DMs[k].friend.full_name,))),
+                         builder: (_) => channel_chat_window(iter: 0, g_index: index, channel_index: k,can_write: can_write.toString(),)));},
                 child: Container(
                   margin: EdgeInsets.only(
                     top: 5.0,
@@ -80,7 +87,7 @@ class list_of_channels extends StatelessWidget {
                           CircleAvatar(
                             radius: 35.0,
                             backgroundImage:
-                            AssetImage('assets/images/greg.jpg.png'),
+                            AssetImage('assets/images/channels_icon.png'),
                           ),
                           SizedBox(width: 10.0),
                           Column(
@@ -89,7 +96,7 @@ class list_of_channels extends StatelessWidget {
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.50,
                                 child: Text(
-                                  channels[k].name,
+                                  list_of_groups[index].channels_group_member_is_part_of[k].channel_name,
                                   style: TextStyle(
                                     color: Colors.grey,
                                     fontSize: 20.0,
@@ -99,62 +106,54 @@ class list_of_channels extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(height: 5.0),
-                              Text(
-                                "Channel Text",
-                                style: TextStyle(
-                                  color: Colors.blueGrey,
-                                  fontSize: 17.0,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
                             ],
                           ),
                         ],
                       ),
                       Column(
                         children: <Widget>[
+                          list_of_groups[index].channels_group_member_is_part_of[k].channel_name.toString() != "general" ?
                           PopupMenuButton(itemBuilder: (context) {
                             return [
                               PopupMenuItem(
-                                value: 'edit',
-                                child: Text('Edit',style: TextStyle(fontWeight: FontWeight.bold),),
+                                value: 'edit name',
+                                child: Text('Edit Channel Name',style: TextStyle(fontWeight: FontWeight.bold),),
                               ),
+
+                              PopupMenuItem(
+                                value: 'edit permissions',
+                                child: Text('Edit Channel Permissions',style: TextStyle(fontWeight: FontWeight.bold),),
+                              ),
+
                               PopupMenuItem(
                                 value: 'delete',
-                                child: Text('Delete', style: TextStyle(fontWeight: FontWeight.bold),),
+                                child: Text('Delete Channel', style: TextStyle(fontWeight: FontWeight.bold),),
                               ),
                             ];
                           },
-                            onSelected: (String value){
-                              if(value=='edit'){
+                            onSelected: (String value) async {
+                              if(value=='edit name'){
                                 print("edit value pressed");
                               }
+
+                              else if(value=="edit permissions"){
+                                List<String> response_from_API = await request_for_roles(list_of_groups[index].group_id, list_of_groups[index].channels_group_member_is_part_of[k].channel_name, index,k);
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) => add_channel_perms_for_new_role(g_index: index,chan_index: k,)));
+                              }
+
                               else if(value=='delete')
                               {
-                                _showDialog_for_confirm_delete_account(context);
+                                List<String> response_from_API = await delete_channel_request(list_of_groups[index].group_id, list_of_groups[index].channels_group_member_is_part_of[k].channel_name);
+                                response_from_API[1] == "true" ?
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) => User_dashboard())) : _showDialog_for_confirm_delete_account(context,response_from_API[0]);
+                               
                               }
                             },
-                          ),
+                          ) : Text(""),
                           SizedBox(height: 5.0),
-                          chats[k].unread
-                              ? Container(
-                            width: 40.0,
-                            height: 20.0,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).primaryColor,
-                              borderRadius: BorderRadius.circular(28.0),
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              'NEW',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 13.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          )
-                              : Text(''),
+
                         ],
                       ),
                     ],

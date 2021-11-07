@@ -1,19 +1,27 @@
+import 'dart:math';
+
+import 'package:chat_app_project/group_requests/delete_role.dart';
 import 'package:chat_app_project/models/Groups.dart';
+import 'package:chat_app_project/models/Groups_class_final.dart';
 import 'package:chat_app_project/pages/Groups_Page.dart';
 import 'package:chat_app_project/pages/change_role_name_page.dart';
 import 'package:chat_app_project/pages/edit_roles_and_permissions.dart';
+import 'package:chat_app_project/pages/group_channels.dart';
 import 'package:chat_app_project/pages/show_roles.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class new_list_of_roles extends StatefulWidget {
-  const new_list_of_roles({Key? key}) : super(key: key);
+  int index;
+  new_list_of_roles({required this.index});
 
   @override
-  _new_list_of_rolesState createState() => _new_list_of_rolesState();
+  _new_list_of_rolesState createState() => _new_list_of_rolesState(index: index);
 }
 
 class _new_list_of_rolesState extends State<new_list_of_roles> {
+  int index;
+  _new_list_of_rolesState({required this.index});
   List<String> roles=["Teacher","Student","Principal","Administrator"];
   List<Color> colors=[Colors.lightBlue,Colors.lightBlueAccent,Colors.lightGreen,Colors.lightGreenAccent,Colors.lime,Colors.limeAccent];
   @override
@@ -52,22 +60,24 @@ class _new_list_of_rolesState extends State<new_list_of_roles> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: new Text("Alert!"),
-          content: new Text("Are you sure you want to delete the role $role?"),
+          content: new Text("$role as you do not have permission"),
           actions: <Widget>[
             new FlatButton(
-              child: new Text("CANCEL"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            new FlatButton(
-                onPressed: () {Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => show_roles()));},
-                child: new Text("YES"))
+                onPressed: () async {
+                  Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => show_roles(g_index: index,)));
+                  },
+                child: new Text("OK"))
           ],
         );
       },
     );
+  }
+
+  Color _choose_random_color(){
+    Random random = new Random();
+    int randomNumber = random.nextInt(6) + 0;
+    return colors[randomNumber];
   }
 
   Widget build(BuildContext context) {
@@ -87,7 +97,7 @@ class _new_list_of_rolesState extends State<new_list_of_roles> {
             topRight: Radius.circular(28.0),
           ),
           child: ListView.builder(
-            itemCount: roles.length,
+            itemCount: list_of_groups[index].all_roles.length,
             itemBuilder: (BuildContext context, int k) {
               return GestureDetector(
                 onTap: () {print("role pressed");},
@@ -100,7 +110,7 @@ class _new_list_of_rolesState extends State<new_list_of_roles> {
                   padding:
                   EdgeInsets.symmetric(horizontal: 7.5, vertical: 10.0),
                   decoration: BoxDecoration(
-                      color: colors[k],
+                      color: _choose_random_color(),
                       borderRadius: BorderRadius.only(
                         topRight: Radius.circular(20.0),
                         bottomRight: Radius.circular(20.0),
@@ -117,7 +127,7 @@ class _new_list_of_rolesState extends State<new_list_of_roles> {
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.50,
                                 child: Text(
-                                  roles[k],
+                                  list_of_groups[index].all_roles[k].role_name,
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 20.0,
@@ -132,6 +142,7 @@ class _new_list_of_rolesState extends State<new_list_of_roles> {
                       ),
                       Column(
                         children: <Widget>[
+                          (list_of_groups[index].all_roles[k].role_name.toString()!="Admin" && list_of_groups[index].all_roles[k].role_name.toString()!="Everyone") ?
                           PopupMenuButton(itemBuilder: (context) {
                             return [
                               PopupMenuItem(
@@ -144,29 +155,31 @@ class _new_list_of_rolesState extends State<new_list_of_roles> {
                               ),
                               PopupMenuItem(
                                 value: 'delete',
-                                child: Text('Delete Role', style: TextStyle(fontWeight: FontWeight.bold),),
+                                child: Text('Delete Role', style: TextStyle(fontWeight: FontWeight.bold,color: Colors.red),),
                               ),
                             ];
                           },
-                            onSelected: (String value){
+                            onSelected: (String value) async {
                               if(value=='edit permissions'){
                                 Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) => edit_roles_and_permissions()));
+                                    MaterialPageRoute(builder: (context) => edit_roles_and_permissions(g_index: index,role_index: k,)));
                               }
 
                               else if(value=='edit role name')
                               {
                                 Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) => change_role_name(curr_role_name: roles[k],)));
+                                    MaterialPageRoute(builder: (context) => change_role_name(curr_role_name: list_of_groups[index].all_roles[k].role_name,g_index: index,index_for_role: k,)));
                               }
 
                               else if(value=='delete')
                               {
-                                roles.removeAt(k);
-                                _showDialog_for_confirm_delete_account(context, roles[k]);
+                                List<String> response_from_API = await delete_role_request(list_of_groups[index].all_roles[k].role_name.toString(),list_of_groups[index].group_id);
+                                response_from_API[1]=="true" ?
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) => group_channels(index: index,))) : _showDialog_for_confirm_delete_account(context,response_from_API[0]);
                               }
                             },
-                          ),
+                          ) : SizedBox.shrink(),
 
                           SizedBox(height: 2.5),
 

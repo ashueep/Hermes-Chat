@@ -271,3 +271,23 @@ Content-Type: application/json
     "roles" : ["Admin","Everyone","headboy"]
     
 }
+###
+POST http://localhost:3000/api/channels/617be91deb1123ffd8f81e39/viewMessages
+Content-Type: application/json
+
+{
+    "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFsYW4iLCJpYXQiOjE2MzU4MzE3MDMsImV4cCI6MTYzNTkwMzcwM30.qDKfLK4yuzC_zHIAvPg1Z0bJx0JHapruZKarU_lRDCo",
+    "chaName" : "memes" 
+}
+
+###
+POST http://localhost:3000/api/channels/617be91deb1123ffd8f81e39/sendAllRolesForChannel/
+Content-Type: application/json
+
+{
+    "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFsYW4iLCJpYXQiOjE2MzU4NDAwNzIsImV4cCI6MTYzNTkxMjA3Mn0.1KDicgpv9bc_RzY0Me2Nuu2XwYce12saM0oHcM2M5OA",
+    "chaName" : "memes" 
+}
+
+
+

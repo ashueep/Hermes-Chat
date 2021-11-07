@@ -1,5 +1,7 @@
 // ignore_for_file: camel_case_types, file_names
 
+import 'package:chat_app_project/global_variables.dart';
+import 'package:chat_app_project/models/getting_DM_List.dart';
 import 'package:chat_app_project/pages/Groups_Page.dart';
 import 'package:chat_app_project/pages/User_dashboard.dart';
 import 'package:flutter/material.dart';
@@ -7,10 +9,10 @@ import 'package:flutter/widgets.dart';
 
 class CategorySelector_for_group extends StatefulWidget {
   @override
-  _Curr_state createState() => _Curr_state();
+  _CategorySelector_for_group createState() => _CategorySelector_for_group();
 }
 
-class _Curr_state extends State<CategorySelector_for_group> {
+class _CategorySelector_for_group extends State<CategorySelector_for_group> {
   int curr_index = 1;
   final List<String> diff_pages = [
     'Direct Messages',
@@ -28,7 +30,8 @@ class _Curr_state extends State<CategorySelector_for_group> {
         itemCount: diff_pages.length,
         itemBuilder: (BuildContext context, int i) {
           return GestureDetector(
-            onTap: () {
+            onTap: () async {
+              final List<String> response = await fetch_DM_List(jwt_token);
               setState(() {
                 curr_index = i;
                 curr_index == 0

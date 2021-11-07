@@ -42,7 +42,7 @@ const hasPermissionBool = async (toCheck) => {
     } else {
 
         var perms = new Set()
-        convo['roles'].forEach(role => {
+        for( role of convo['roles'] ){
             
             if(userRoles.includes(role.name)){ 
 
@@ -54,6 +54,9 @@ const hasPermissionBool = async (toCheck) => {
                     var channel_perms = role['channelPermissions'].filter(function (channel) {
                         return channel.chaName == chaName;
                     })
+                    if(!channel_perms | !channel_perms.length){
+                        continue
+                    }
                     channel_perms = channel_perms[0]['permissions']
                     //console.log(channel_perms)
                     channel_perms.forEach(cperm => perms.add(cperm))
@@ -65,7 +68,7 @@ const hasPermissionBool = async (toCheck) => {
                     return false;
                 }
             }
-        })
+        }
 
         //console.log('perms', perms)
         if( perms.has(valPerm) == false ) {
@@ -121,7 +124,7 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
         }
         
         if(res.group['channels'].some(x => x['name'] == req.body.chaName)){
-            res.status(400).json({message: "channel already exists"});
+            res.status(400).json({message: "channel already exists", success: false});
             return;
         }
         
@@ -130,9 +133,42 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
             messages: [],
         })
 
-        if(req.body.view != null){
+        var memberx = await conversation.aggregate([{
+            $match: {'_id':  mongoose.Types.ObjectId(req.params.id)}
+        }, {
+            $unwind: "$members"
+        }, {
+            $match: {'members.memberID': mongoose.Types.ObjectId(res.user._id.toString())}
+        }, {
+            $project: {
+                roles: "$members.roles" 
+            }
+        }])
+        // console.log(memberx)
+
+        userRoles = memberx[0]['roles'];
+        var roleArr = [];
+
+        res.group["roles"].forEach(role => {
+            if(userRoles.includes(role.name) && role["groupPermissions"].includes(1)){
+                roleArr.push(role.name);
+            }
+        })
+
+        if(!roleArr.includes("Admin")) roleArr.push("Admin")
+
+        var roleJSON = {
+            "view": roleArr,
+            "write": roleArr,
+            "edit": roleArr,
+            "delete": roleArr
+        }
+        
+
+
+        if(roleJSON.view != null){
             console.log('in this1 statement')
-            var allroles = req.body.view
+            var allroles = roleJSON.view
             //allroles = ["Faculty", "Admin", "Student"]
             //1: roles = "Faculty"
             //2: roles = "Admin"
@@ -156,9 +192,9 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
             })
         }
 
-        if(req.body.write != null){
+        if(roleJSON.write != null){
             console.log('in this other statement')
-            var allroles = req.body.write
+            var allroles = roleJSON.write
             if(!allroles.includes("Admin")) allroles.push("Admin");
 
             //allroles = ["Faculty", "Admin"]
@@ -180,9 +216,9 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
             })
         }
 
-        if(req.body.edit != null){
+        if(roleJSON.edit != null){
             console.log('in this other statement')
-            var allroles = req.body.edit
+            var allroles = roleJSON.edit
             if(!allroles.includes("Admin")) allroles.push("Admin");
 
             //allroles = ["Faculty", "Admin"]
@@ -204,9 +240,9 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
             })
         }
 
-        if(req.body.delete != null){
+        if(roleJSON.delete != null){
             console.log('in this other statement')
-            var allroles = req.body.delete
+            var allroles = roleJSON.delete
             if(!allroles.includes("Admin")) allroles.push("Admin");
 
             //allroles = ["Faculty", "Admin"]
@@ -227,6 +263,8 @@ router.post('/:id/addChannel', auth, isGroupMember, hasPermission({
                 }
             })
         }
+
+        
 
         await res.group.save()
         res.status(200).json({message: `Channel ${req.body.chaName} created`, success: true})
@@ -251,7 +289,7 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
         var oldname = req.body.chaName;
 
         if(req.body.chaName == 'general'){
-            res.status(400).json({message: "cannot modify general channel"})
+            res.status(400).json({message: "cannot modify general channel", success: false})
             return;
         }
 
@@ -285,7 +323,8 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
             else checkname = oldname;
             var allroles = req.body.view;
             res.group['roles'].forEach(role => {
-                role = editChannel(allroles, role, reqJSON.view, checkname);
+                if(role.name != "Admin")
+                    role = editChannel(allroles, role, reqJSON.view, checkname);
             })
         }
         if(req.body.write != null){
@@ -294,7 +333,8 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
             else checkname = oldname;
             var allroles = req.body.write;
             res.group['roles'].forEach(role => {
-                role = editChannel(allroles, role, reqJSON.write, checkname);
+                if(role.name != "Admin")
+                    role = editChannel(allroles, role, reqJSON.write, checkname);
             })
         }
         if(req.body.edit != null){
@@ -303,7 +343,8 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
             else checkname = oldname;
             var allroles = req.body.edit;
             res.group['roles'].forEach(role => {
-                role = editChannel(allroles, role, reqJSON.edit, checkname);
+                if(role.name != "Admin")
+                    role = editChannel(allroles, role, reqJSON.edit, checkname);
             })
         }
         if(req.body.delete != null){
@@ -312,7 +353,8 @@ router.post("/:id/editChannel", auth, isGroupMember, hasPermission({
             else checkname = oldname;
             var allroles = req.body.delete;
             res.group['roles'].forEach(role => {
-                role = editChannel(allroles, role, reqJSON.delete, checkname);
+                if(role.name != "Admin")
+                    role = editChannel(allroles, role, reqJSON.delete, checkname);
             })
         }
         
@@ -369,7 +411,7 @@ router.post('/:id/deleteChannel', auth, isGroupMember, hasPermission({
             {safe: true}
         );
         
-        res.status(200).json({message: `Deleted channel ${req.body.chaName}`, success: false})
+        res.status(200).json({message: `Deleted channel ${req.body.chaName}`, success: true})
         
     } catch (err) {
         console.log(err)
@@ -484,7 +526,7 @@ function editChannel(allroles, role, perm, checkname){
         if(role['channelPermissions'].some(arrVal => arrVal['chaName'] == checkname)){
             var ind = role['channelPermissions'].findIndex(arrVal => arrVal['chaName'] == checkname)
             if(ind !== -1){
-                if (perm in [2, 3,4] && !role['channelPermissions'][ind]['permissions'].includes(1)){
+                if ([2,3,4].includes(perm) && !role['channelPermissions'][ind]['permissions'].includes(1)){
                     role['channelPermissions'][ind]['permissions'].push(1);
                 }
                 if (!role['channelPermissions'][ind]['permissions'].includes(perm)){
@@ -507,7 +549,7 @@ function editChannel(allroles, role, perm, checkname){
     return role;
 }
 
-router.post(":id/sendAllRolesForChannel/", auth, isGroupMember, async (req, res) =>{
+router.post("/:id/sendAllRolesForChannel/", auth, isGroupMember, async (req, res) =>{
     try {
         var channels_list = [];
         res.group["channels"].forEach(channel => {
@@ -531,5 +573,68 @@ router.post(":id/sendAllRolesForChannel/", auth, isGroupMember, async (req, res)
     }
 })
 
+router.post("/:id/getChannelPermissions/", auth, isGroupMember, async (req, res) =>{
+
+    try {
+    
+        if(!req.body.chaName){
+
+            return res.status(400).json({message: "Name of channel missing", success: false})
+        }
+
+        var index = res.group['channels'].findIndex(chan => chan['name'] == req.body.chaName);
+        if(index == -1){
+
+            return res.status(404).json({message: "Channel does not exist", success: false});;
+        }
+
+        let perm_num
+        if(req.body.perm){
+
+            if(req.body.perm == "view")
+                perm_num = 1
+            else if(req.body.perm == "write")
+                perm_num = 2
+            else if(req.body.perm == "edit")
+                perm_num = 3
+            else if(req.body.perm == "delete")
+                perm_num = 4
+        }
+
+        if(!perm_num){
+
+            res.status(400).json({message: "Did not specify permission or specified an invalid one", success: false})
+        }
+
+        //Create list of json objects of the format:
+        //{rolename: "RandomRole", perm: true/false}
+        let permissions = []
+        let chaPerm
+        for(let role of res.group.roles){
+
+            chaPerm = role.channelPermissions.find(some_chaPerm => some_chaPerm.chaName == req.body.chaName)
+
+            if(!chaPerm){
+
+                permissions.push({rolename: role.name, perm: false})
+            }
+            else{
+
+                if(chaPerm.permissions.includes(perm_num)){
+                    permissions.push({rolename: role.name, perm: true})
+                }
+                else{
+                    permissions.push({rolename: role.name, perm: false})
+                }
+            }
+        }
+        
+        res.status(200).json({message: "Channel permissions fetched", permissions: permissions, success: true})
+
+    } catch(err){
+
+        res.status(500).json({message: error.message, success: false})
+    }
+})
 
 module.exports = router

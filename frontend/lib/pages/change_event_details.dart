@@ -1,3 +1,5 @@
+import 'package:chat_app_project/group_requests/edit_event_members_request_to_API.dart';
+import 'package:chat_app_project/models/Groups_class_final.dart';
 import 'package:chat_app_project/pages/show_events.dart';
 import 'package:chat_app_project/repeated_colors/repeated_colors.dart';
 import 'package:flutter/cupertino.dart';
@@ -5,14 +7,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
+import 'group_channels.dart';
+
 class change_event_details extends StatefulWidget {
-  const change_event_details({Key? key}) : super(key: key);
+  int g_index;
+  int event_index;
+  change_event_details({required this.g_index,required this.event_index});
 
   @override
-  _change_event_detailsState createState() => _change_event_detailsState();
+  _change_event_detailsState createState() => _change_event_detailsState(g_index: g_index,event_index: event_index);
 }
 
 class _change_event_detailsState extends State<change_event_details> {
+  int g_index;
+  int event_index;
+  _change_event_detailsState({required this.g_index, required this.event_index});
   final Group_name_controller = TextEditingController();
   final date_time_controller = TextEditingController();
   final event_description_controller = TextEditingController();
@@ -177,9 +186,9 @@ class _change_event_detailsState extends State<change_event_details> {
       child: RaisedButton(
         elevation: 5.0,
         onPressed: () async {
-          //final List<String> reponse_from_API_for_login = await sendData((Group_name_controller.text).toString(),(Password_controller.text).toString());
+          List<String> response_from_API = await edit_event_details_request(list_of_groups[g_index].events_that_group_member_is_part_of[event_index].event_id, list_of_groups[g_index].group_id, Group_name_controller.text, event_description_controller.text, date_time_controller.text);
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => show_events()));
+              MaterialPageRoute(builder: (context) => group_channels(index: g_index,)));
         },
         padding: EdgeInsets.all(15.0),
         shape: RoundedRectangleBorder(

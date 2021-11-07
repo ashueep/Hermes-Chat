@@ -8,12 +8,13 @@ import 'package:chat_app_project/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-
-
 class Chat_Window extends StatefulWidget {
   final int iter;
   final String full_name;
-  Chat_Window({required this.iter,required this.full_name});
+  Chat_Window({
+    required this.iter,
+    required this.full_name,
+  });
   @override
   _Chat_WindowState createState() => _Chat_WindowState(iter: iter);
 }
@@ -24,15 +25,13 @@ class _Chat_WindowState extends State<Chat_Window> {
   var message_sending_controller = TextEditingController();
 
   @override
-
-  void initState(){
-  super.initState();
-  initSocket();
+  void initState() {
+    super.initState();
+    initSocket();
   }
 
-  void initSocket()
-  {
-    IO.Socket socket = IO.io('http://192.168.116.1:3000/', <String,dynamic>{
+  void initSocket() {
+    IO.Socket socket = IO.io('$global_link/', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });
@@ -42,16 +41,18 @@ class _Chat_WindowState extends State<Chat_Window> {
     socket.onConnect((_) {
       print("connected to websocket");
     });
-    var DM_var={'dmid': list_of_DMs[iter].DM_id};
+    var DM_var = {'dmid': list_of_DMs[iter].DM_id};
     json.encode(DM_var);
-    socket.emit('connectDM',DM_var);
-    socket.on('recvDM',(data){
-      Map<String,dynamic> body = json.decode(data);
+    socket.emit('connectDM', DM_var);
+    socket.on('recvDM', (data) {
+      Map<String, dynamic> body = json.decode(data);
       setState(() {
-        list_of_DMs[iter].messages.add(updated_mssg_model(sender_username: body['sender_username'], text_message: body['body'], time_stamp: body['timestamp']));
+        list_of_DMs[iter].messages.add(updated_mssg_model(
+            sender_username: body['sender_username'],
+            text_message: body['body'],
+            time_stamp: body['timestamp']));
       });
     });
-
   }
 
   void dispose() {
@@ -60,35 +61,34 @@ class _Chat_WindowState extends State<Chat_Window> {
   }
 
   void send_message(String text) {
-    IO.Socket socket_for_sending = IO.io('http://192.168.116.1:3000/', <String,dynamic>{
+    IO.Socket socket_for_sending = IO.io('$global_link/', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });
     socket_for_sending.connect();
-    if(text!='')
-      {
-        var messg_to_post = {
-          'room' : list_of_DMs[iter].DM_id,
-          'sender' : username_of_current_user,
-          'text' : text,
-        };
-        json.encode(messg_to_post);
-        socket_for_sending.emit('sendDM',messg_to_post);
-      }
+    if (text != '') {
+      var messg_to_post = {
+        'room': list_of_DMs[iter].DM_id,
+        'sender': username_of_current_user,
+        'text': text,
+      };
+      json.encode(messg_to_post);
+      socket_for_sending.emit('sendDM', messg_to_post);
+    }
   }
 
   Widget build(BuildContext context) {
-    List<updated_mssg_model>? temp_messages=list_of_DMs[iter].messages;
+    List<updated_mssg_model>? temp_messages = list_of_DMs[iter].messages;
 
     _Build_message(updated_mssg_model mssg, bool is_user) {
-      bool yes_or_no=true;
+      bool yes_or_no = true;
       final Container message = Container(
         margin: is_user
             ? EdgeInsets.only(top: 7.5, bottom: 7.5, left: 79.5)
             : EdgeInsets.only(
-          top: 7.5,
-          bottom: 7.5,
-        ),
+                top: 7.5,
+                bottom: 7.5,
+              ),
         padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 15.0),
         width: MediaQuery.of(context).size.width * 0.75,
         decoration: BoxDecoration(
@@ -97,13 +97,13 @@ class _Chat_WindowState extends State<Chat_Window> {
               : Color((0xFFFFEFEE)),
           borderRadius: is_user
               ? BorderRadius.only(
-            topLeft: Radius.circular(18.0),
-            bottomLeft: Radius.circular(18.0),
-          )
+                  topLeft: Radius.circular(18.0),
+                  bottomLeft: Radius.circular(18.0),
+                )
               : BorderRadius.only(
-            bottomRight: Radius.circular(18.0),
-            topRight: Radius.circular(18.0),
-          ),
+                  bottomRight: Radius.circular(18.0),
+                  topRight: Radius.circular(18.0),
+                ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -163,10 +163,10 @@ class _Chat_WindowState extends State<Chat_Window> {
             ),
             Expanded(
                 child: TextField(
-                  textCapitalization: TextCapitalization.sentences,
-                  decoration: InputDecoration(hintText: 'Type Your Message'),
-                  controller: message_sending_controller,
-                )),
+              textCapitalization: TextCapitalization.sentences,
+              decoration: InputDecoration(hintText: 'Type Your Message'),
+              controller: message_sending_controller,
+            )),
             IconButton(
               icon: Icon(Icons.send),
               iconSize: 24.5,
@@ -174,9 +174,13 @@ class _Chat_WindowState extends State<Chat_Window> {
               onPressed: () async {
                 send_message(message_sending_controller.text);
                 setState(() {
-                  list_of_DMs[iter].messages.insert(0,updated_mssg_model(sender_username: username_of_current_user, text_message: message_sending_controller.text, time_stamp: "2:40"));
+                  list_of_DMs[iter].messages.insert(
+                      0,
+                      updated_mssg_model(
+                          sender_username: username_of_current_user,
+                          text_message: message_sending_controller.text,
+                          time_stamp: "2:40"));
                 });
-
               },
             ),
           ],
@@ -226,13 +230,15 @@ class _Chat_WindowState extends State<Chat_Window> {
                     itemCount: temp_messages!.length,
                     itemBuilder: (BuildContext context, int l) {
                       return _Build_message(
-                          temp_messages![l], temp_messages[l].sender_username==username_of_current_user);
+                          temp_messages![l],
+                          temp_messages[l].sender_username ==
+                              username_of_current_user);
                     },
                   ),
                 ),
               ),
             ),
-            _buildMessageSendingBar(),
+            can_write == "true" ? _buildMessageSendingBar() : Text(''),
           ],
         ),
       ),

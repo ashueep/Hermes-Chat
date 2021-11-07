@@ -1,9 +1,10 @@
 import 'package:chat_app_project/models/Groups.dart';
 import 'package:chat_app_project/models/channels.dart';
 import 'package:chat_app_project/models/message_model.dart';
+import 'package:chat_app_project/pages/create_new_channel.dart';
 import 'package:chat_app_project/widgets/Category_selector.dart';
 import 'package:chat_app_project/widgets/Category_selector_for_groups.dart';
-import 'package:chat_app_project/widgets/Group_members_widget.dart';
+import 'package:chat_app_project/widgets/group_customisations.dart';
 import 'package:chat_app_project/widgets/list_of_channels.dart';
 import 'package:chat_app_project/widgets/messages_sent_recieved.dart';
 import 'package:chat_app_project/widgets/recent_chats_widget.dart';
@@ -11,21 +12,28 @@ import 'package:flutter/material.dart';
 
 // ignore: camel_case_types
 class group_channels extends StatefulWidget {
-  final List<CHANNELS> channels;
-  final Groups group;
-  group_channels({required this.channels,required this.group});
+
+  int index;
+  group_channels({required this.index});
   @override
-  _group_channels_state createState() => _group_channels_state(channels: channels,group: group);
+  _group_channels_state createState() => _group_channels_state(index: index);
 }
 
 class _group_channels_state extends State<group_channels> {
-  final List<CHANNELS> channels;
-  final Groups group;
-  _group_channels_state({required this.channels,required this.group});
+  int index;
+  _group_channels_state({required this.index});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.red,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          
+           Navigator.push(context,
+               MaterialPageRoute(builder: (context) => create_new_channel_page(g_index: index)));
+        },
+        child: const Icon(Icons.add_circle_outline_sharp),
+      ),
       appBar: AppBar(
         backgroundColor: Colors.red,
         centerTitle: true,
@@ -63,8 +71,8 @@ class _group_channels_state extends State<group_channels> {
                   )),
               child: Column(
                 children: <Widget>[
-                  group_members(members: group.Members ,),
-                  list_of_channels(channels: group.group_channels,),
+                  group_members(index: index),
+                  list_of_channels(index: index),
                 ],
               ),
             ),

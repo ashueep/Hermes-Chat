@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 
 
 class Group_Page extends StatefulWidget {
-  Group_Page({Key? key}) : super(key: key);
+
 
   @override
   _Group_PageState createState() => _Group_PageState();
@@ -40,13 +40,13 @@ class _Group_PageState extends State<Group_Page> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: true ? FloatingActionButton(
         onPressed: () {
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => create_new_account()));
+              MaterialPageRoute(builder: (context) => create_new_group_hermes()));
         },
         child: const Icon(Icons.add_circle_outline_sharp),
-      ),
+      ): SizedBox.shrink(),
       backgroundColor: Colors.red,
       appBar: AppBar(
         centerTitle: true,

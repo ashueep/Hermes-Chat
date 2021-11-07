@@ -90,7 +90,7 @@ router.post("/:id/deleteMember", auth, isGroupMember, hasPermission({
         const mem_roles = res.group["members"][ind_mem]["roles"];
         const user_roles = res.group["members"][ind_user]["roles"];
 
-        if(mem_id == req.user._id){
+        if(mem_id.toString() == res.user._id.toString()){
             return res.status(400).json({message: "Cannot delete yourself! Use the leave group option instead!", success: false})
         }
 

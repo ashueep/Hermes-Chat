@@ -1,7 +1,10 @@
+import 'package:chat_app_project/group_requests/sending_edit_role_name.dart';
+import 'package:chat_app_project/models/Groups_class_final.dart';
 import 'package:chat_app_project/models/Sending_login_credentials_to_API.dart';
 import 'package:chat_app_project/pages/Groups_Page.dart';
 import 'package:chat_app_project/pages/User_dashboard.dart';
 import 'package:chat_app_project/pages/create_account_page.dart';
+import 'package:chat_app_project/pages/group_channels.dart';
 import 'package:chat_app_project/pages/show_roles.dart';
 import 'package:chat_app_project/repeated_colors/repeated_colors.dart';
 import 'package:chat_app_project/widgets/List_of_roles.dart';
@@ -13,13 +16,17 @@ import '../global_variables.dart';
 class change_role_name extends StatefulWidget {
   @override
   final String curr_role_name;
-  change_role_name({required this.curr_role_name});
-  _change_role_name createState() => _change_role_name(curr_role: curr_role_name);
+  int g_index;
+  int index_for_role;
+  change_role_name({required this.curr_role_name, required this.g_index,required this.index_for_role});
+  _change_role_name createState() => _change_role_name(curr_role: curr_role_name,g_index: g_index,index_for_role: index_for_role);
 }
 
 class _change_role_name extends State<change_role_name> {
   final String curr_role;
-  _change_role_name({required this.curr_role});
+  int g_index;
+  int index_for_role;
+  _change_role_name({required this.curr_role,required this.g_index,required this.index_for_role});
   final Group_name_controller = TextEditingController();
   final Password_controller = TextEditingController();
   bool _rememberMe = false;
@@ -88,9 +95,9 @@ class _change_role_name extends State<change_role_name> {
       child: RaisedButton(
         elevation: 5.0,
         onPressed: () async {
-          //final List<String> reponse_from_API_for_login = await sendData((Group_name_controller.text).toString(),(Password_controller.text).toString());
+          List<String> response_from_API = await send_edited_name_for_role(Group_name_controller.text,list_of_groups[g_index].all_roles[index_for_role].role_name,list_of_groups[g_index].group_id);
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => show_roles()));
+              MaterialPageRoute(builder: (context) => group_channels(index: g_index,)));
         },
         padding: EdgeInsets.all(15.0),
         shape: RoundedRectangleBorder(

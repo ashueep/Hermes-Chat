@@ -67,11 +67,11 @@ router.post('/:id/createEvent', auth, isGroupMember, hasPermission({
 }),async (req, res) => {
     try {
         if(req.body.name == null){
-            res.status(401).json({message: "Event name has to be provided"})
+            return res.status(401).json({message: "Event name has to be provided", success: false})
         }
         else{
-            if(req.body.roles != null){
-                req.body.roles.forEach(role => {
+            if(req.body.attendees != null){
+                req.body.attendees.forEach(role => {
                     if(!res.group["roles"].some(x => x["name"] == role)){
                         return res.status(400).json({message: "Some/All roles don't exist in the group! Please enter the correct roles!", success: false})
                     }

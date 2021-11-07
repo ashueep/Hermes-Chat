@@ -1,22 +1,30 @@
+import 'dart:math';
+
+import 'package:chat_app_project/group_requests/delete_an_event.dart';
 import 'package:chat_app_project/models/Groups.dart';
+import 'package:chat_app_project/models/Groups_class_final.dart';
 import 'package:chat_app_project/pages/Groups_Page.dart';
 import 'package:chat_app_project/pages/change_event_details.dart';
 import 'package:chat_app_project/pages/change_role_name_page.dart';
 import 'package:chat_app_project/pages/edit_event_members.dart';
 import 'package:chat_app_project/pages/edit_roles_and_permissions.dart';
 import 'package:chat_app_project/pages/event_members_display.dart';
+import 'package:chat_app_project/pages/group_channels.dart';
 import 'package:chat_app_project/pages/show_roles.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class list_pf_events extends StatefulWidget {
-  const list_pf_events({Key? key}) : super(key: key);
+  int g_index;
+  list_pf_events({required this.g_index});
 
   @override
-  _list_pf_eventsState createState() => _list_pf_eventsState();
+  _list_pf_eventsState createState() => _list_pf_eventsState(g_index: g_index);
 }
 
 class _list_pf_eventsState extends State<list_pf_events> {
+  int g_index;
+  _list_pf_eventsState({required this.g_index});
   List<String> events=["Front end design progress week 3","College fest discussion","engineer tech fest"];
   List<Color> colors=[Colors.lightBlue,Colors.lightBlueAccent,Colors.lightGreen,Colors.lightGreenAccent,Colors.lime,Colors.limeAccent];
   @override
@@ -55,7 +63,7 @@ class _list_pf_eventsState extends State<list_pf_events> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: new Text("Alert!"),
-          content: new Text("Are you sure you want to delete the event $event?"),
+          content: new Text("$event"),
           actions: <Widget>[
             new FlatButton(
               child: new Text("CANCEL"),
@@ -65,7 +73,7 @@ class _list_pf_eventsState extends State<list_pf_events> {
             ),
             new FlatButton(
                 onPressed: () {Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => show_roles()));},
+                    MaterialPageRoute(builder: (context) => show_roles(g_index: 0,)));},
                 child: new Text("YES"))
           ],
         );
@@ -74,6 +82,13 @@ class _list_pf_eventsState extends State<list_pf_events> {
   }
 
   Widget build(BuildContext context) {
+
+    Color _choose_random_color(){
+      Random random = new Random();
+      int randomNumber = random.nextInt(6) + 0;
+      return colors[randomNumber];
+    }
+
     return Expanded(
       child: Container(
         height: 278.0, //just used to test
@@ -90,7 +105,7 @@ class _list_pf_eventsState extends State<list_pf_events> {
             topRight: Radius.circular(28.0),
           ),
           child: ListView.builder(
-            itemCount: events.length,
+            itemCount: list_of_groups[g_index].events_that_group_member_is_part_of.length,
             itemBuilder: (BuildContext context, int k) {
               return GestureDetector(
                 onTap: () {print("role pressed");},
@@ -101,9 +116,9 @@ class _list_pf_eventsState extends State<list_pf_events> {
                     right: 10.0,
                   ),
                   padding:
-                  EdgeInsets.symmetric(horizontal: 7.5, vertical: 10.0),
+                  EdgeInsets.symmetric(horizontal: 7.5, vertical: 20.0),
                   decoration: BoxDecoration(
-                      color: colors[k],
+                      color: _choose_random_color(),
                       borderRadius: BorderRadius.only(
                         topRight: Radius.circular(20.0),
                         bottomRight: Radius.circular(20.0),
@@ -120,7 +135,7 @@ class _list_pf_eventsState extends State<list_pf_events> {
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.50,
                                 child: Text(
-                                  events[k] ,
+                                  list_of_groups[g_index].events_that_group_member_is_part_of[k].event_name,
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 20.0,
@@ -133,7 +148,7 @@ class _list_pf_eventsState extends State<list_pf_events> {
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.50,
                                 child: Text(
-                                  "Event Description: " + events[k],
+                                  "Event Description: \n" + list_of_groups[g_index].events_that_group_member_is_part_of[k].event_description,
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 20.0,
@@ -164,21 +179,25 @@ class _list_pf_eventsState extends State<list_pf_events> {
                               ),
                             ];
                           },
-                            onSelected: (String value){
+                            onSelected: (String value) async{
                               if(value=='edit event members'){
                                 Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) => event_members_page_edit_event_members()));
+                                    MaterialPageRoute(builder: (context) => event_members_page_edit_event_members(g_index: g_index,event_index: k,)));
                               }
 
                               else if(value=='edit event name')
                               {
                                 Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) => change_event_details()));
+                                    MaterialPageRoute(builder: (context) => change_event_details(g_index: g_index,event_index: k,)));
                               }
 
                               else if(value=='delete event')
                               {
-                                _showDialog_for_confirm_delete_event(context, groups[k].Group_name);
+                                List<String> response_from_API = await delete_event_request(list_of_groups[g_index].events_that_group_member_is_part_of[k].event_id, list_of_groups[g_index].group_id);
+                                // _showDialog_for_confirm_delete_event(context, groups[k].Group_name);
+                                response_from_API[1] == "true" ?
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) => group_channels(index: g_index,))) : _showDialog_for_confirm_delete_event(context, response_from_API[0]);
                               }
                             },
                           ),
