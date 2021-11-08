@@ -9,6 +9,7 @@ const fs = require('fs')
 
 //For debug purposes only
 //Getting all
+/*
 router.get('/getAccounts/',  async (req, res) => {
 
     try {
@@ -20,6 +21,7 @@ router.get('/getAccounts/',  async (req, res) => {
         res.status(500).json({ message: err.message, success: false })  //Status 500: Internal Server Error
     }
 })
+*/
 
 //For debug purposes only
 //Getting one
