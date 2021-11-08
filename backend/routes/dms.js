@@ -172,18 +172,18 @@ router.post('/:id/view/', auth, async (req, res) => {
         var messages = [];
 
 
-        console.log(dm['messages'])
-        console.log("hello");
+        // console.log(dm['messages'])
+        // console.log("hello");
         for(const mess of dm['messages']){
             const mid = dm['messages'][mess]
-            console.log(mess,mid)
+            console.log(mess)
             console.log('messageid mid: ', mess)
             const m = await message.findOne({ _id : mess })
             const sender = await User.findById(m.senderID)
             messages.push({
                 sender: sender.username,
                 body: m.body,
-                timeStamp: "2:40"
+                timeStamp: m.timeStamp
             })
         }
 
