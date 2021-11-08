@@ -105,17 +105,9 @@ const insertChan = async (sender, body, room, timestamp) => {
 
 }
 
-    var debug_sockets
-    var count = 0
-
     io.on('connection', socket => {
 
-        //Debug*******************************
-        debug_sockets[socket.id.toString()] = count
-        count++
-        //Debug*******************************
-
-        console.log('connected socket: ', debug_sockets[socket.id.toString()])
+        console.log('connected socket: ', socket.id)
         socket.on('connectDM', (dmid) => {
             socket.join(dmid['dmid']);
             console.log('connectDM', dmid)
@@ -127,41 +119,46 @@ const insertChan = async (sender, body, room, timestamp) => {
         })
 
         socket.on('sendChan', message => {
-            console.log("hello grp")
+
             room = message.room
             sender = message.sender
             text = message.text
             console.log(message)
-            const time = Date.now()
+            //Get time
+            let datetime = new Date(Date.now())
+            let timestamp = datetime.toISOString().split('.')[0]
 
-            insertChan(sender, text, room, time)
+            insertChan(sender, text, room, timestamp)
 
             socket.to(room).emit('recvChan', {
                 senderID: sender,
                 body: text,
-                timestamp: time
+                timestamp: timestamp
             })
         })
 
         socket.on('sendDM', message => {
-            console.log("hello")
+
             room = message.room
             sender = message.sender
             text = message.text
             console.log(message)
-            const time = Date.now()
+            
+            //Get time
+            let datetime = new Date(Date.now())
+            let timestamp = datetime.toISOString().split('.')[0]
 
-            insert(sender, text, room, time)
+            insert(sender, text, room, timestamp)
 
             socket.in(room).emit('recvDM', {
                 senderID: sender,
                 body: text,
-                timestamp: time
+                timestamp: timestamp
             })
 
         })
         socket.on('disconnect', () => {
-            console.log('removing user', debug_sockets[socket.id.toString()])
+            console.log('removing user')
         })
     })
 
