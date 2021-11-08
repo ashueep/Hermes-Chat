@@ -152,7 +152,7 @@ const insertChan = async (sender, body, room, timestamp) => {
 
         })
         socket.on('disconnect', () => {
-            console.log('removing user', socket)
+            console.log('removing user', socket.id)
         })
     })
 
