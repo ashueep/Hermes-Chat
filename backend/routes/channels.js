@@ -501,7 +501,7 @@ router.post('/:id/viewMessages/', auth, isGroupMember, hasPermission({
             messages.push({
                 sender: sender.username,
                 body: m.body,
-                timeStamp: "2:40"
+                timeStamp: m.timeStamp
             })
         }
 
