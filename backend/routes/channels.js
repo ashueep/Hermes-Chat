@@ -491,13 +491,13 @@ router.post('/:id/viewMessages/', auth, isGroupMember, hasPermission({
         })
 
 
-        console.log(channel)
-        console.log("hello");
+        //console.log(channel)
+        //console.log("hello");
         for(const mess of channel['messages']){
-            console.log('messageid mid: ', mess)
+            //console.log('messageid mid: ', mess)
             const m = await message.findOne({ _id : mess })
             const sender = await User.findById(m.senderID)
-            console.log(m)
+            //console.log(m)
             messages.push({
                 sender: sender.username,
                 body: m.body,

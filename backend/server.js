@@ -105,8 +105,17 @@ const insertChan = async (sender, body, room, timestamp) => {
 
 }
 
+    var debug_sockets
+    var count = 0
+
     io.on('connection', socket => {
-        console.log('connected socket', socket.id)
+
+        //Debug*******************************
+        debug_sockets[socket.id.toString()] = count
+        count++
+        //Debug*******************************
+
+        console.log('connected socket: ', debug_sockets[socket.id.toString()])
         socket.on('connectDM', (dmid) => {
             socket.join(dmid['dmid']);
             console.log('connectDM', dmid)
@@ -152,7 +161,7 @@ const insertChan = async (sender, body, room, timestamp) => {
 
         })
         socket.on('disconnect', () => {
-            console.log('removing user', socket.id)
+            console.log('removing user', debug_sockets[socket.id.toString()])
         })
     })
 
