@@ -105,7 +105,6 @@ const insertChan = async (sender, body, room, timestamp) => {
 
 }
 
-try {
     io.on('connection', socket => {
         console.log('connected socket', socket.id)
         socket.on('connectDM', (dmid) => {
@@ -123,7 +122,7 @@ try {
             room = message.room
             sender = message.sender
             text = message.text
-            console.log(room,message)
+            console.log(message)
             const time = Date.now()
 
             insertChan(sender, text, room, time)
@@ -140,7 +139,7 @@ try {
             room = message.room
             sender = message.sender
             text = message.text
-            console.log(room)
+            console.log(message)
             const time = Date.now()
 
             insert(sender, text, room, time)
@@ -153,12 +152,9 @@ try {
 
         })
         socket.on('disconnect', () => {
-            console.log('removing user')
+            console.log('removing user', socket)
         })
     })
-} catch (err) {
-    console.log(err)
-}
 
 const httpServer = http.listen(HTTP_PORT, (err) => {
     
