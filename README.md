@@ -10,4 +10,6 @@ Team:
 
 # Tech Stack
 
-1. Nodejs, MongoDB, Flutter.
+1. Nodejs
+2. MongoDB
+3. Flutter (FrontEnd)
