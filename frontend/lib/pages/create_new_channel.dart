@@ -1,11 +1,15 @@
 import 'package:chat_app_project/group_requests/create_new-group.dart';
 import 'package:chat_app_project/group_requests/create_new_channel.dart';
 import 'package:chat_app_project/models/Groups_class_final.dart';
+import 'package:chat_app_project/models/dm_model.dart';
+import 'package:chat_app_project/models/getting_DM_List.dart';
+import 'package:chat_app_project/models/request_for_list_of_messages_DM.dart';
 import 'package:chat_app_project/repeated_colors/repeated_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../global_variables.dart';
 import 'User_dashboard.dart';
 
 class create_new_channel_page extends StatefulWidget {
@@ -124,7 +128,11 @@ class _create_new_channel_pageState extends State<create_new_channel_page> {
         elevation: 5.0,
         onPressed: () async {
           List<String> reponse_from_API_for_create_group = await create_new_channel_request(list_of_groups[g_index].group_id,Group_name_controller.text.toString());
-
+          final List<String> response_for_requesting_DM_List = await fetch_DM_List(jwt_token);
+          for(int m=0;m<list_of_DMs.length;m++)
+          {
+            await request_for_list_of_messages_for_DM(m);
+          }
           reponse_from_API_for_create_group[1] == "true" ?
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => User_dashboard())) : _showDialog_for_create_new_group_failure(context, reponse_from_API_for_create_group[0]);
@@ -187,7 +195,7 @@ class _create_new_channel_pageState extends State<create_new_channel_page> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Text(
-                        'Create new HERMES group',
+                        'Create new HERMES channel',
                         style: TextStyle(
                           color: Colors.white,
                           fontFamily: 'OpenSans',

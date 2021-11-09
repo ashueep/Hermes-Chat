@@ -141,7 +141,7 @@ class _permission_for_a_particular_roleState extends State<permission_for_a_part
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               Container(
-                                width: MediaQuery.of(context).size.width * 0.50,
+                                width: MediaQuery.of(context).size.width * 0.60,
                                 child: Text(
                                   permissions[k],
                                   style: TextStyle(

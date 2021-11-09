@@ -3,6 +3,7 @@ import 'package:chat_app_project/models/Groups_class_final.dart';
 import 'package:chat_app_project/models/dm_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:chat_app_project/global_variables.dart';
+import 'package:intl/intl.dart';
 import '../global_variables.dart';
 
 Future<List<String>> fetch_channel_List(String token, String group_id,
@@ -47,6 +48,9 @@ Future<List<String>> fetch_channel_List(String token, String group_id,
       sender = one_val['sender'];
       body_text = one_val['body'];
       timeStamp = one_val['timeStamp'];
+      DateTime date_received = DateFormat("yyyy-MM-ddTHH:mm:ss").parse(timeStamp, true);
+      DateTime local_date = date_received.toLocal();
+      String parsed_date = local_date.toString();
 
       members_class temp_member = members_class(
           member_id: "",
@@ -54,7 +58,7 @@ Future<List<String>> fetch_channel_List(String token, String group_id,
           member_full_name: "",
           member_roles: []);
       channel_messages temp_message = channel_messages(
-          sent_by: temp_member, body_text: body_text, timestamp: timeStamp);
+          sent_by: temp_member, body_text: body_text, timestamp: parsed_date);
       print(temp_member.member_username);
       print("debugging");
       list_of_groups[g_index]

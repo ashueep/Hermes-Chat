@@ -33,19 +33,19 @@ Future<List<String>> create_new_role(String name, List<bool> permissions, String
   print(returned_create_new_role_response.statusCode);
   if(returned_create_new_role_response.statusCode==500)
   {
-    return ["false","Server Failure"];
+    return ["Server Failure","false"];
   }
 
   else if(returned_create_new_role_response.statusCode==200 || returned_create_new_role_response.statusCode==201 && decoded_retured_response['success']==true){
     temp_mssg=decoded_retured_response['message'];
     success_var=decoded_retured_response['success'];
 
-    return [temp_mssg,success_var.toString()];
+    return [temp_mssg,"true"];
   }
 
   else
     {
-      return [temp_mssg,success_var.toString()];
+      return [temp_mssg,"false"];
     }
 
 

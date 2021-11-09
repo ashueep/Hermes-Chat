@@ -1,7 +1,9 @@
 // ignore_for_file: camel_case_types, file_names
 
 import 'package:chat_app_project/global_variables.dart';
+import 'package:chat_app_project/models/dm_model.dart';
 import 'package:chat_app_project/models/getting_DM_List.dart';
+import 'package:chat_app_project/models/request_for_list_of_messages_DM.dart';
 import 'package:chat_app_project/pages/Groups_Page.dart';
 import 'package:chat_app_project/pages/User_dashboard.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +34,10 @@ class _CategorySelector_for_group extends State<CategorySelector_for_group> {
           return GestureDetector(
             onTap: () async {
               final List<String> response = await fetch_DM_List(jwt_token);
+              for(int m=0;m<list_of_DMs.length;m++)
+              {
+                await request_for_list_of_messages_for_DM(m);
+              }
               setState(() {
                 curr_index = i;
                 curr_index == 0

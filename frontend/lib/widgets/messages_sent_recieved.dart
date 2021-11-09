@@ -1,3 +1,4 @@
+import 'package:chat_app_project/global_variables.dart';
 import 'package:chat_app_project/models/dm_model.dart';
 import 'package:chat_app_project/models/message_model.dart';
 import 'package:chat_app_project/models/request_for_list_of_messages_DM.dart';
@@ -51,6 +52,7 @@ class chats_received_sent extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           CircleAvatar(
                             radius: 35.0,
@@ -74,12 +76,19 @@ class chats_received_sent extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(height: 5.0),
-                              Text(
-                                "",
-                                style: TextStyle(
-                                  color: Colors.blueGrey,
-                                  fontSize: 17.0,
-                                  fontWeight: FontWeight.w600,
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.45,
+                                child: Text(
+                                  list_of_DMs[k].messages.length!=0 ?
+                                  (list_of_DMs[k].messages[0].sender_username==username_of_current_user ?
+                                  "you: " + list_of_DMs[k].messages[0].text_message : list_of_DMs[k].messages[0].sender_username + ": " + list_of_DMs[k].messages[0].text_message) : "no convo started",
+                                  style: TextStyle(
+                                    color: Colors.blueGrey,
+                                    fontSize: 17.0,
+                                    fontWeight: FontWeight.w800,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ],
@@ -89,7 +98,7 @@ class chats_received_sent extends StatelessWidget {
                       Column(
                         children: <Widget>[
                           Text(
-                            "2:40",
+                            list_of_DMs[k].messages[0].time_stamp.split(" ")[1].split(".")[0],
                             style: TextStyle(
                               color: Colors.blueGrey,
                               fontSize: 18.0,

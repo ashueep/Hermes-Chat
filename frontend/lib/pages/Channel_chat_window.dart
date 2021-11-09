@@ -2,9 +2,12 @@ import 'dart:convert';
 
 import 'package:chat_app_project/models/Groups_class_final.dart';
 import 'package:chat_app_project/models/dm_model.dart';
+import 'package:chat_app_project/models/get_all_channel_messages.dart';
 import 'package:chat_app_project/models/recv_class_for_messg.dart';
+import 'package:chat_app_project/pages/group_channels.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import '../global_variables.dart';
@@ -33,6 +36,8 @@ class _channel_chat_windowState extends State<channel_chat_window> {
   int g_index;
   int channel_index;
   String can_write;
+  IO.Socket? socket_for_channel;
+  IO.Socket? socket_for_sending;
   _channel_chat_windowState(
       {required this.iter,
       required this.g_index,
@@ -51,15 +56,15 @@ class _channel_chat_windowState extends State<channel_chat_window> {
         .length);
   }
 
-  void initSocket() {
-    IO.Socket socket_for_channel = IO.io('$global_link/', <String, dynamic>{
+  Future<void> initSocket() async {
+    socket_for_channel = IO.io('$global_link/', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });
     print("hello");
-    socket_for_channel.connect();
-    print(socket_for_channel.connected);
-    socket_for_channel.onConnect((_) {
+    socket_for_channel!.connect();
+    print(socket_for_channel!.connected);
+    socket_for_channel!.onConnect((_) {
       print("connected to websocket for channel");
     });
     //   var DM_var={'dmid': list_of_DMs[iter].DM_id};
@@ -79,31 +84,38 @@ class _channel_chat_windowState extends State<channel_chat_window> {
         .channel_name;
     var connect_var = {'room': "$g_id-$channel_name"};
     json.encode(connect_var);
-    socket_for_channel.emit('connectChan', connect_var);
-    socket_for_channel.on('recvChan', (data) {
+    socket_for_channel!.emit('connectChan', connect_var);
+    socket_for_channel!.on('recvChan', (data) {
       print("inside receive chan");
-      // Map<String,dynamic> body = json.decode(data);
-      // print(data);
-      // setState(() {
-      //   channel_messages temp_message = channel_messages(sent_by: body['senderID'], body_text: body['body'], timestamp: body['timestamp']);
-      //   print(body);
-      //   list_of_groups[g_index].channels_group_member_is_part_of[channel_index].channel_mssgs.add(temp_message);
-      // });
+      Map<String,dynamic> body = data;
+      print(body);
+      print(data);
+      print(data.runtimeType);
+      print(body.runtimeType);
+      setState(() {
+        DateTime date_received = DateFormat("yyyy-MM-ddTHH:mm:ss").parse(body['timestamp'], true);
+        DateTime local_date = date_received.toLocal();
+        String parsed_date = local_date.toString();
+        members_class temp_member = members_class(member_id: "", member_username: body['senderID'], member_full_name: "", member_roles: []);
+        channel_messages temp_message = channel_messages(sent_by: temp_member, body_text: body['body'], timestamp: parsed_date);
+        print(body);
+        list_of_groups[g_index].channels_group_member_is_part_of[channel_index].channel_mssgs.insert(0,temp_message);
+      });
     });
   }
 
-  void dispose() {
-    //socket.emit('disconnectDM');
-    super.dispose();
-  }
+  // void dispose() {
+  //   //socket.emit('disconnectDM');
+  //   super.dispose();
+  // }
 
   void send_message(String text) {
-    IO.Socket socket_for_sending = IO.io('$global_link/', <String, dynamic>{
-      'transports': ['websocket'],
-      'autoConnect': false,
-    });
-    socket_for_sending.connect();
-    print(socket_for_sending.connected);
+    // socket_for_channel = IO.io('$global_link/', <String, dynamic>{
+    //   'transports': ['websocket'],
+    //   'autoConnect': false,
+    // });
+    // socket_for_channel!.connect();
+    // print(socket_for_channel!.connected);
     if (text != '') {
       String g_id = list_of_groups[g_index].group_id;
       print("sending message");
@@ -117,8 +129,9 @@ class _channel_chat_windowState extends State<channel_chat_window> {
       };
       json.encode(messg_to_post);
       print(messg_to_post);
-      socket_for_sending.emit('sendChan', messg_to_post);
+      socket_for_channel!.emit('sendChan', messg_to_post);
       setState(() {
+        String date_now = DateTime.now().toString();
         print("inside set state");
         list_of_groups[g_index]
             .channels_group_member_is_part_of[channel_index]
@@ -132,9 +145,16 @@ class _channel_chat_windowState extends State<channel_chat_window> {
                         member_full_name: "",
                         member_roles: []),
                     body_text: message_sending_controller.text.toString(),
-                    timestamp: "2:40"));
+                    timestamp: date_now));
       });
     }
+  }
+  @override
+  void dispose() {
+    print("disconnecting");
+    //socket_for_sending!.disconnect();
+    socket_for_channel!.disconnect();
+    super.dispose();
   }
 
   Widget build(BuildContext context) {
@@ -148,7 +168,7 @@ class _channel_chat_windowState extends State<channel_chat_window> {
                 bottom: 7.5,
               ),
         padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 15.0),
-        width: MediaQuery.of(context).size.width * 0.75,
+        width: MediaQuery.of(context).size.width * 0.80,
         decoration: BoxDecoration(
           color: is_user
               ? Theme.of(context).primaryColorLight
@@ -163,30 +183,50 @@ class _channel_chat_windowState extends State<channel_chat_window> {
                   topRight: Radius.circular(18.0),
                 ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              mssg.sent_by.member_username,
-              style: TextStyle(
-                color: Colors.blueGrey,
-                fontSize: 16.0,
-                fontWeight: FontWeight.w600,
-              ),
+
+           child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+
+                Text(
+                  mssg.timestamp.split(" ")[1].split(".")[0],
+                  style: TextStyle(
+                    color: Colors.blueGrey,
+                    fontSize: 15.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                Text(
+                  mssg.sent_by.member_username,
+                  style: TextStyle(
+                    color: Colors.blueGrey,
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(
+                  height: 7.5,
+                ),
+                Text(
+                  mssg.body_text,
+                  style: TextStyle(
+                    color: Colors.blueGrey,
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(
-              height: 7.5,
-            ),
-            Text(
-              mssg.body_text,
-              style: TextStyle(
-                color: Colors.blueGrey,
-                fontSize: 16.0,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
+
+            // Text(
+            //   mssg.timestamp,
+            //   style: TextStyle(
+            //     color: Colors.blueGrey,
+            //     fontSize: 16.0,
+            //     fontWeight: FontWeight.w600,
+            //   ),
+            // ),
       );
 
       if (true) {
@@ -231,6 +271,7 @@ class _channel_chat_windowState extends State<channel_chat_window> {
               color: Theme.of(context).primaryColor,
               onPressed: () async {
                 send_message(message_sending_controller.text);
+                message_sending_controller.text='';
                 setState(() {
                   print("trying to update messages");
                 });
@@ -246,6 +287,20 @@ class _channel_chat_windowState extends State<channel_chat_window> {
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.red,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          iconSize: 30.0,
+          color: Colors.white,
+          onPressed: () async{
+            dispose();
+            for(int m=0;m<list_of_groups[g_index].channels_group_member_is_part_of.length;m++)
+              {
+                List<String> response = await fetch_channel_List(jwt_token, list_of_groups[g_index].group_id, list_of_groups[g_index].channels_group_member_is_part_of[m].channel_name, g_index, m);
+              }
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => group_channels(index: g_index)));
+          },
+        ),
         title: Text(
             list_of_groups[g_index]
                 .channels_group_member_is_part_of[channel_index]

@@ -20,9 +20,9 @@ class recent_chats extends StatelessWidget {
                   'Recent chats',
                   style: TextStyle(
                     color: Colors.blueGrey,
-                    fontSize: 20.0,
+                    fontSize: 19.0,
                     fontWeight: FontWeight.bold,
-                    letterSpacing: 1.1,
+                    letterSpacing: 1.0,
                   ),
                 ),
                 IconButton(
@@ -61,7 +61,7 @@ class recent_chats extends StatelessWidget {
                           list_of_DMs[j].friend.full_name,
                           style: TextStyle(
                               fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                               color: Colors.blueGrey),
                         ),
                       ],

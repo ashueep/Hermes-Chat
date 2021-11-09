@@ -1,13 +1,17 @@
 // ignore_for_file: file_names
 
+import 'package:chat_app_project/models/dm_model.dart';
+import 'package:chat_app_project/models/getting_DM_List.dart';
 import 'package:chat_app_project/models/logout_request.dart';
 import 'package:chat_app_project/models/message_model.dart';
+import 'package:chat_app_project/models/request_for_list_of_messages_DM.dart';
 import 'package:chat_app_project/pages/login_page.dart';
 import 'package:chat_app_project/widgets/Category_selector.dart';
 import 'package:chat_app_project/widgets/messages_sent_recieved.dart';
 import 'package:chat_app_project/widgets/recent_chats_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../global_variables.dart';
 import 'create_new_DM.dart';
 import 'create_new_group.dart';
 
@@ -19,6 +23,15 @@ class User_dashboard extends StatefulWidget {
 
 class _User_dashboard_state extends State<User_dashboard> {
   @override
+
+  Future<List<String>> get_list() async{
+    final List<String> response_for_requesting_DM_List = await fetch_DM_List(jwt_token);
+    for(int m=0;m<list_of_DMs.length;m++)
+    {
+      await request_for_list_of_messages_for_DM(m);
+    }
+    return ["success"];
+  }
 
   menu_handler(context,item)async
   {
@@ -86,10 +99,10 @@ class _User_dashboard_state extends State<User_dashboard> {
 
 
 
-        title: Text('Dashboard',
+        title: Text('$username_of_current_user\'s Dashboard',
             style: TextStyle(
                 color: Colors.white,
-                fontSize: 30.0,
+                fontSize: 22.0,
                 fontWeight: FontWeight.bold)),
         elevation: 0.0,
       ),
