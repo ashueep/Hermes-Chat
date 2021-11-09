@@ -3,12 +3,15 @@ import 'package:chat_app_project/group_requests/delete_group_request.dart';
 import 'package:chat_app_project/group_requests/get_list_of_all_channels.dart';
 import 'package:chat_app_project/models/Groups.dart';
 import 'package:chat_app_project/models/Groups_class_final.dart';
+import 'package:chat_app_project/models/get_all_channel_messages.dart';
 import 'package:chat_app_project/models/message_model.dart';
 import 'package:chat_app_project/pages/Groups_Page.dart';
 import 'package:chat_app_project/pages/User_dashboard.dart';
 import 'package:chat_app_project/pages/chat_window.dart';
 import 'package:chat_app_project/pages/group_channels.dart';
 import 'package:flutter/material.dart';
+
+import '../global_variables.dart';
 
 class Groups_chats extends StatelessWidget {
   @override
@@ -83,6 +86,10 @@ class Groups_chats extends StatelessWidget {
                 onTap: () async {
 
                   List<String> response_from_API = await get_all_channels(list_of_groups[k].group_id, k);
+                  for(int m=0;m<list_of_groups[k].channels_group_member_is_part_of.length;m++)
+                  {
+                    List<String> response = await fetch_channel_List(jwt_token, list_of_groups[k].group_id, list_of_groups[k].channels_group_member_is_part_of[m].channel_name, k, m);
+                  }
                   response_from_API[0]=="true"?
                   Navigator.push(
                       context,

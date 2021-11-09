@@ -157,7 +157,7 @@ class _change_role_name extends State<change_role_name> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Text(
-                        'Start new HERMES Direct Message',
+                        'Edit Role Name',
                         style: TextStyle(
                           color: Colors.white,
                           fontFamily: 'OpenSans',

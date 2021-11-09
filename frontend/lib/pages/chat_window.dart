@@ -2,10 +2,14 @@ import 'dart:convert';
 
 import 'package:chat_app_project/global_variables.dart';
 import 'package:chat_app_project/models/dm_model.dart';
+import 'package:chat_app_project/models/getting_DM_List.dart';
 import 'package:chat_app_project/models/message_model.dart';
 import 'package:chat_app_project/models/recv_class_for_messg.dart';
+import 'package:chat_app_project/models/request_for_list_of_messages_DM.dart';
 import 'package:chat_app_project/models/user_model.dart';
+import 'package:chat_app_project/pages/User_dashboard.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class Chat_Window extends StatefulWidget {
@@ -23,49 +27,59 @@ class _Chat_WindowState extends State<Chat_Window> {
   final int iter;
   _Chat_WindowState({required this.iter});
   var message_sending_controller = TextEditingController();
+  IO.Socket? socket;
 
   @override
-  void initState() {
+  initState(){
     super.initState();
     initSocket();
   }
 
-  void initSocket() {
-    IO.Socket socket = IO.io('$global_link/', <String, dynamic>{
+  Future<void> initSocket() async {
+    socket = IO.io('$global_link/', <String,dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });
     print("hello");
-    socket.connect();
-    print(socket.connected);
-    socket.onConnect((_) {
+    socket!.connect();
+    print(socket!.connected);
+    socket!.onConnect((_) {
       print("connected to websocket");
     });
     var DM_var = {'dmid': list_of_DMs[iter].DM_id};
     json.encode(DM_var);
-    socket.emit('connectDM', DM_var);
-    socket.on('recvDM', (data) {
-      Map<String, dynamic> body = json.decode(data);
+    socket!.emit('connectDM', DM_var);
+    print("emitting");
+    socket!.on('recvDM', (data) {
+      print("test 1......");
+      print("test 2........");
+      print(data);
+      print("this is the type...");
+      print(data.runtimeType);
+      Map<String,dynamic> body = data;
+      print(body);
+      print("test 2........");
       setState(() {
-        list_of_DMs[iter].messages.add(updated_mssg_model(
-            sender_username: body['sender_username'],
+        print("inside recvDM sockets part of it!!!!!!");
+        String date = body['timestamp'];
+        print(date);
+        DateTime date_received = DateFormat("yyyy-MM-ddTHH:mm:ss").parse(date, true);
+        DateTime local_date = date_received.toLocal();
+        String parsed_date = local_date.toString();
+        list_of_DMs[iter].messages.insert(0,updated_mssg_model(
+            sender_username: body['senderID'],
             text_message: body['body'],
-            time_stamp: body['timestamp']));
+            time_stamp: parsed_date));
       });
     });
   }
 
-  void dispose() {
-    //socket.emit('disconnectDM');
-    super.dispose();
-  }
-
   void send_message(String text) {
-    IO.Socket socket_for_sending = IO.io('$global_link/', <String, dynamic>{
-      'transports': ['websocket'],
-      'autoConnect': false,
-    });
-    socket_for_sending.connect();
+    // socket_for_sending = IO.io('$global_link/', <String, dynamic>{
+    //   'transports': ['websocket'],
+    //   'autoConnect': false,
+    // });
+    // socket_for_sending!.connect();
     if (text != '') {
       var messg_to_post = {
         'room': list_of_DMs[iter].DM_id,
@@ -73,10 +87,24 @@ class _Chat_WindowState extends State<Chat_Window> {
         'text': text,
       };
       json.encode(messg_to_post);
-      socket_for_sending.emit('sendDM', messg_to_post);
+      socket!.emit('sendDM', messg_to_post);
+      print("sent message");
+      setState(() {
+        String date_now = DateTime.now().toString();
+        updated_mssg_model temp_message = updated_mssg_model(sender_username: username_of_current_user, text_message: text, time_stamp: date_now);
+        list_of_DMs[iter].messages.insert(0, temp_message);
+      });
     }
   }
 
+  @override
+  void dispose() {
+    print("socket disconnecting........................................");
+    socket!.disconnect();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     List<updated_mssg_model>? temp_messages = list_of_DMs[iter].messages;
 
@@ -111,8 +139,8 @@ class _Chat_WindowState extends State<Chat_Window> {
             Text(
               mssg.time_stamp,
               style: TextStyle(
-                color: Colors.blueGrey,
-                fontSize: 16.0,
+                color: Colors.black26,
+                fontSize: 13.0,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -174,12 +202,7 @@ class _Chat_WindowState extends State<Chat_Window> {
               onPressed: () async {
                 send_message(message_sending_controller.text);
                 setState(() {
-                  list_of_DMs[iter].messages.insert(
-                      0,
-                      updated_mssg_model(
-                          sender_username: username_of_current_user,
-                          text_message: message_sending_controller.text,
-                          time_stamp: "2:40"));
+                  message_sending_controller.text='';
                 });
               },
             ),
@@ -199,12 +222,27 @@ class _Chat_WindowState extends State<Chat_Window> {
                 fontSize: 30.0,
                 fontWeight: FontWeight.bold)),
         elevation: 0.0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          iconSize: 30.0,
+          color: Colors.white,
+          onPressed: () async{
+            dispose();
+            final List<String> response_for_requesting_DM_List = await fetch_DM_List(jwt_token);
+            for(int m=0;m<list_of_DMs.length;m++)
+            {
+              await request_for_list_of_messages_for_DM(m);
+            }
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => User_dashboard()));
+          },
+        ),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.more_horiz),
             iconSize: 40.0,
             color: Colors.white,
-            onPressed: () {},
+            onPressed: () {print("horiz button being pressed...");},
           ),
         ],
       ),
@@ -227,10 +265,10 @@ class _Chat_WindowState extends State<Chat_Window> {
                   child: ListView.builder(
                     reverse: true,
                     padding: EdgeInsets.only(top: 15.0),
-                    itemCount: temp_messages!.length,
+                    itemCount: temp_messages.length,
                     itemBuilder: (BuildContext context, int l) {
                       return _Build_message(
-                          temp_messages![l],
+                          temp_messages[l],
                           temp_messages[l].sender_username ==
                               username_of_current_user);
                     },
@@ -238,7 +276,7 @@ class _Chat_WindowState extends State<Chat_Window> {
                 ),
               ),
             ),
-            can_write == "true" ? _buildMessageSendingBar() : Text(''),
+            _buildMessageSendingBar(),
           ],
         ),
       ),

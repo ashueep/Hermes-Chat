@@ -133,7 +133,7 @@ class _create_new_group_memberState extends State<create_new_group_member> {
         ),
         color: Colors.white,
         child: Text(
-          'CREATE',
+          'ADD',
           style: TextStyle(
             color: Color(0xFF527DAA),
             letterSpacing: 1.5,

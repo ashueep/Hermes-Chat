@@ -4,6 +4,7 @@ import 'package:chat_app_project/widgets/List_of_roles.dart';
 import 'package:http/http.dart' as http;
 import 'package:chat_app_project/global_variables.dart';
 import 'package:chat_app_project/models/recv_class_for_messg.dart';
+import 'package:intl/intl.dart';
 
 request_for_list_of_messages_for_DM(int k) async {
   Map jwt_token_var = {'token': jwt_token};
@@ -40,7 +41,12 @@ request_for_list_of_messages_for_DM(int k) async {
       temp_message1.sender_username = temp_message.sender_username;
       print(temp_message1.sender_username);
 
-      temp_message.time_stamp = temp_messages_list[i]['timeStamp'];
+      String temp_date = temp_messages_list[i]['timeStamp'];
+      //DateTime temp_date = temp_date2.toLocal();
+      //String parsed_date = temp_date.hour.toString() + ":" + temp_date.minute.toString();
+      DateTime date_received = DateFormat("yyyy-MM-ddTHH:mm:ss").parse(temp_date, true);
+      DateTime local_date = date_received.toLocal();
+      temp_message.time_stamp = local_date.toString();
       print(temp_message.time_stamp);
 
       temp_message1.time_stamp = temp_message.time_stamp;

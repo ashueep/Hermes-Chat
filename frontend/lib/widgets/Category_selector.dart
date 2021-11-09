@@ -73,7 +73,7 @@ class _Curr_state extends State<CategorySelector> {
                   color: i == curr_index ? Colors.white : Colors.white60,
                   fontSize: 23.0,
                   fontWeight: FontWeight.bold,
-                  letterSpacing: 1.2,
+                  letterSpacing: 1.1,
                 ),
               ),
             ),

@@ -26,6 +26,7 @@ class _roles_for_a_particular_group_memberState extends State<roles_for_a_partic
 
   void initState()
   {
+    bool_value_for_roles_of_group_member=[];
     for(int i=0;i<list_of_groups[g_index].all_roles.length;i++)
       {
         bool_value_for_roles_of_group_member.add(false);

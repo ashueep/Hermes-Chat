@@ -44,12 +44,16 @@ Future<List<String>> fetch_all_members_of_a_group(String group_id,int g_index) a
         List<String> member_roles_in_string=[];
         //member_id = member['id'];
         member_username=member['username'];
+        print(member_username);
         var member_roles = member['roles'];
         for(int i=0;i<member_roles.length;i++)
           {
             member_roles_in_string.add(member_roles[i].toString());
+            print(member_roles[i].toString());
           }
         members_class temp_one_member = members_class(member_id: "", member_username: member_username, member_full_name: "", member_roles: member_roles_in_string);
+        print(temp_one_member.member_username);
+        print(temp_one_member.member_roles.length);
         list_of_groups[g_index].members.add(temp_one_member);
       }
     return ["true","success"];

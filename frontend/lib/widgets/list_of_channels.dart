@@ -106,6 +106,20 @@ class list_of_channels extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(height: 5.0),
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.45,
+                                child: Text(
+                                  list_of_groups[index].channels_group_member_is_part_of[k].channel_mssgs.length!=0 ?
+                                  (list_of_groups[index].channels_group_member_is_part_of[k].channel_mssgs[0].sent_by==username_of_current_user ?
+                                  "you: " + list_of_groups[index].channels_group_member_is_part_of[k].channel_mssgs[0].body_text : list_of_groups[index].channels_group_member_is_part_of[k].channel_mssgs[0].sent_by.member_username + ": " + list_of_groups[index].channels_group_member_is_part_of[k].channel_mssgs[0].body_text) : "no messages currently",
+                                  style: TextStyle(
+                                    color: Colors.blueGrey,
+                                    fontSize: 17.0,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
                             ],
                           ),
                         ],

@@ -57,8 +57,9 @@ class _add_group_permissions_pageState extends State<add_group_permissions_page>
       floatingActionButton: FloatingActionButton(
        onPressed: () async {
          List<String> response_from_API = await create_new_role(role_name_new, value2, list_of_groups[g_index].group_id);
+         response_from_API[1]=="true" ?
         Navigator.push(context,
-             MaterialPageRoute(builder: (context) => group_channels(index: g_index,)));
+             MaterialPageRoute(builder: (context) => group_channels(index: g_index,))) : _showDialog_for_login_failure(context,response_from_API[0]);
        },
        child: const Icon(Icons.arrow_forward_ios_outlined),
       ),

@@ -1,10 +1,13 @@
 import 'package:chat_app_project/models/Sending_login_credentials_to_API.dart';
+import 'package:chat_app_project/models/dm_model.dart';
 import 'package:chat_app_project/models/getting_DM_List.dart';
+import 'package:chat_app_project/models/request_for_list_of_messages_DM.dart';
 import 'package:chat_app_project/pages/User_dashboard.dart';
 import 'package:chat_app_project/pages/create_account_page.dart';
 import 'package:chat_app_project/repeated_colors/repeated_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import '../global_variables.dart';
 
@@ -17,6 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final Username_controller = TextEditingController();
   final Password_controller = TextEditingController();
   bool _rememberMe = false;
+  IO.Socket? socket;
 
   void _showDialog_for_login_failure(BuildContext context,String message) {
     showDialog(
@@ -65,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Icons.email,
                 color: Colors.white,
               ),
-              hintText: 'Enter Username',
+              hintText: 'Enter Email',
               hintStyle: kHintTextStyle,
             ),
           ),
@@ -136,6 +140,10 @@ class _LoginScreenState extends State<LoginScreen> {
              if(reponse_from_API_for_login[1]=="true")
                {
                  final List<String> response_for_requesting_DM_List = await fetch_DM_List(jwt_token);
+                 for(int m=0;m<list_of_DMs.length;m++)
+                   {
+                     await request_for_list_of_messages_for_DM(m);
+                   }
                  if(response_for_requesting_DM_List=="true")
                    {
                      Navigator.push(context,
