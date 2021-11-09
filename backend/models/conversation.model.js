@@ -1,38 +1,52 @@
 const mongoose = require("mongoose")
 
+const memberSchema = mongoose.Schema({
+    memberID: {
+        type: mongoose.Types.ObjectId,
+        ref: 'User'
+    },
+    roles: [String],
+})
+
 const convoSchema = mongoose.Schema({
     name: {
         type: String,
     },
     creatorID: {
         type: mongoose.Types.ObjectId,
-        ref: 'User',
-        require: true,
+        ref: 'User'
     },
-    members: [{
-        memberID: {
-            type: mongoose.Types.ObjectId,
-            ref: 'User',
-            require: true,
-        },
-        roles: [String],
-    }],
+    members: [memberSchema],
     channels: [{
         name: {
-            type: String,
-            required: true,
+            type: String
         },
         messages: [{ type: mongoose.Types.ObjectId, ref: 'Message' }],
     }],
     roles: [{
         name: {
-            type: String,
-            require: true,
+            type: String
         },
         groupPermissions: [Number],
         channelPermissions: [{
-            chaName: String,
+            chaName: {
+                type: String
+            },
             permissions: [Number]
+        }]
+    }],
+    events: [{
+        name: {
+            type: String
+        },
+        datetime: {
+            type: String,
+        },
+        description: {
+            type: String,
+        },
+        attendees: [{
+            type: String,
         }]
     }]
 });

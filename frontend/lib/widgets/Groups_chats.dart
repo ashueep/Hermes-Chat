@@ -1,6 +1,11 @@
+import 'package:chat_app_project/group_member_requests/receive_all_roles_part_of_channel.dart';
+import 'package:chat_app_project/group_requests/delete_group_request.dart';
+import 'package:chat_app_project/group_requests/get_list_of_all_channels.dart';
 import 'package:chat_app_project/models/Groups.dart';
+import 'package:chat_app_project/models/Groups_class_final.dart';
 import 'package:chat_app_project/models/message_model.dart';
 import 'package:chat_app_project/pages/Groups_Page.dart';
+import 'package:chat_app_project/pages/User_dashboard.dart';
 import 'package:chat_app_project/pages/chat_window.dart';
 import 'package:chat_app_project/pages/group_channels.dart';
 import 'package:flutter/material.dart';
@@ -8,13 +13,13 @@ import 'package:flutter/material.dart';
 class Groups_chats extends StatelessWidget {
   @override
 
-  void _showDialog_for_confirm_delete_account(BuildContext context) {
+  void _showDialog_for_confirm_delete_account(BuildContext context,String message,int k) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: new Text("Alert!"),
-          content: new Text("Are you sure you want to delete this group?"),
+          content: new Text(message),
           actions: <Widget>[
             new FlatButton(
               child: new Text("CANCEL"),
@@ -23,9 +28,32 @@ class Groups_chats extends StatelessWidget {
               },
             ),
             new FlatButton(
-                onPressed: () {Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Group_Page()));},
+                onPressed: () async {
+                  List<String> response_from_API = await exit_group_request(list_of_groups[k].group_id);
+                  response_from_API[1]=="true" ?
+                  Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => User_dashboard())) : _showDialog_for_confirm_failure(context, response_from_API[0]);},
                  child: new Text("YES"))
+          ],
+        );
+      },
+    );
+  }
+
+  void _showDialog_for_confirm_failure(BuildContext context,String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: new Text("Alert!"),
+          content: new Text(message),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
           ],
         );
       },
@@ -49,13 +77,18 @@ class Groups_chats extends StatelessWidget {
             topRight: Radius.circular(28.0),
           ),
           child: ListView.builder(
-            itemCount: groups.length,
+            itemCount: list_of_groups.length,
             itemBuilder: (BuildContext context, int k) {
               return GestureDetector(
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => group_channels(channels: groups[k].group_channels,group: groups[k],))),
+                onTap: () async {
+
+                  List<String> response_from_API = await get_all_channels(list_of_groups[k].group_id, k);
+                  response_from_API[0]=="true"?
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => group_channels(index: k,))) : _showDialog_for_confirm_delete_account(context,response_from_API[1],k);
+                },
                 child: Container(
                   margin: EdgeInsets.only(
                     top: 5.0,
@@ -65,7 +98,7 @@ class Groups_chats extends StatelessWidget {
                   padding:
                       EdgeInsets.symmetric(horizontal: 7.5, vertical: 10.0),
                   decoration: BoxDecoration(
-                      color: chats[k].unread ? Color(0xFFFFEFEE) : Colors.white,
+                      color: true ? Color(0xFFFFEFEE) : Colors.white,
                       borderRadius: BorderRadius.only(
                         topRight: Radius.circular(20.0),
                         bottomRight: Radius.circular(20.0),
@@ -78,7 +111,7 @@ class Groups_chats extends StatelessWidget {
                           CircleAvatar(
                             radius: 35.0,
                             backgroundImage:
-                                AssetImage(chats[k].sender.imageUrl),
+                                AssetImage('assets/images/groups_icon.jpg.png'),
                           ),
                           SizedBox(width: 10.0),
                           Column(
@@ -87,7 +120,7 @@ class Groups_chats extends StatelessWidget {
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.50,
                                 child: Text(
-                                  groups[k].Group_name,
+                                  list_of_groups[k].group_name,
                                   style: TextStyle(
                                     color: Colors.blueGrey,
                                     fontSize: 20.0,
@@ -111,7 +144,7 @@ class Groups_chats extends StatelessWidget {
                               ),
                               PopupMenuItem(
                                 value: 'delete',
-                                child: Text('Delete', style: TextStyle(fontWeight: FontWeight.bold),),
+                                child: Text('Exit Group', style: TextStyle(fontWeight: FontWeight.bold),),
                               ),
                             ];
                           },
@@ -121,21 +154,13 @@ class Groups_chats extends StatelessWidget {
                             }
                             else if(value=='delete')
                               {
-                                _showDialog_for_confirm_delete_account(context);
+                                _showDialog_for_confirm_delete_account(context,"Are you sure you want to exit this group?",k);
                               }
                             },
                           ),
 
-                          Text(
-                            chats[k].time,
-                            style: TextStyle(
-                              color: Colors.blueGrey,
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          SizedBox(height: 2.5),
-                          chats[k].unread
+                          SizedBox(height: 1.0),
+                          false
                               ? Container(
                                   width: 40.0,
                                   height: 20.0,

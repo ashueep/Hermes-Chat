@@ -1,3 +1,4 @@
+import 'package:chat_app_project/group_requests/create_new-group.dart';
 import 'package:chat_app_project/models/Sending_login_credentials_to_API.dart';
 import 'package:chat_app_project/pages/Groups_Page.dart';
 import 'package:chat_app_project/pages/User_dashboard.dart';
@@ -8,12 +9,14 @@ import 'package:flutter/services.dart';
 
 import '../global_variables.dart';
 
-class create_new_account extends StatefulWidget {
+class create_new_group_hermes extends StatefulWidget {
+  const create_new_group_hermes({Key? key}) : super(key: key);
+
   @override
-  _create_new_account createState() => _create_new_account();
+  _create_new_group_hermesState createState() => _create_new_group_hermesState();
 }
 
-class _create_new_account extends State<create_new_account> {
+class _create_new_group_hermesState extends State<create_new_group_hermes> {
   final Group_name_controller = TextEditingController();
   final Password_controller = TextEditingController();
   bool _rememberMe = false;
@@ -118,9 +121,11 @@ class _create_new_account extends State<create_new_account> {
       child: RaisedButton(
         elevation: 5.0,
         onPressed: () async {
-          //final List<String> reponse_from_API_for_login = await sendData((Group_name_controller.text).toString(),(Password_controller.text).toString());
+          List<String> reponse_from_API_for_create_group = await create_new_group_request(Group_name_controller.text.toString());
+
+          reponse_from_API_for_create_group[1] == "true" ?
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => Group_Page()));
+              MaterialPageRoute(builder: (context) => User_dashboard())) : _showDialog_for_create_new_group_failure(context, reponse_from_API_for_create_group[0]);
         },
         padding: EdgeInsets.all(15.0),
         shape: RoundedRectangleBorder(
@@ -206,3 +211,4 @@ class _create_new_account extends State<create_new_account> {
     );
   }
 }
+

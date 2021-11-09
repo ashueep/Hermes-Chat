@@ -2,6 +2,7 @@ import 'package:chat_app_project/models/Groups.dart';
 import 'package:chat_app_project/models/Sending_login_credentials_to_API.dart';
 import 'package:chat_app_project/models/message_model.dart';
 import 'package:chat_app_project/pages/Groups_Page.dart';
+import 'package:chat_app_project/pages/change_role_name_page.dart';
 import 'package:chat_app_project/pages/chat_window.dart';
 import 'package:chat_app_project/pages/edit_roles_and_permissions.dart';
 import 'package:chat_app_project/pages/group_channels.dart';
@@ -127,29 +128,54 @@ class list_of_roles extends StatelessWidget {
                       ),
                       Column(
                         children: <Widget>[
-                          PopupMenuButton(itemBuilder: (context) {
-                            return [
-                              PopupMenuItem(
-                                value: 'edit',
-                                child: Text('Edit Role',style: TextStyle(fontWeight: FontWeight.bold),),
-                              ),
-                              PopupMenuItem(
-                                value: 'delete',
-                                child: Text('Delete Role', style: TextStyle(fontWeight: FontWeight.bold),),
-                              ),
-                            ];
-                          },
-                            onSelected: (String value){
-                              if(value=='edit'){
-                                Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) => edit_roles_and_permissions()));
-                              }
-                              else if(value=='delete')
-                              {
-                                _showDialog_for_confirm_delete_account(context, groups[k].Group_name);
-                              }
+                          (roles[k].toString()!="Admin" && roles[k].toString()!="Everyone") ?
+                            PopupMenuButton(itemBuilder: (context) {
+                              return [
+                                PopupMenuItem(
+                                  value: 'edit permissions',
+                                  child: Text('Edit Role Permissions',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold),),
+                                ),
+                                PopupMenuItem(
+                                  value: 'edit role name',
+                                  child: Text('Edit Role Permissions',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold),),
+                                ),
+                                PopupMenuItem(
+                                  value: 'delete',
+                                  child: Text('Delete Role', style: TextStyle(
+                                      fontWeight: FontWeight.bold,color: Colors.redAccent),),
+                                ),
+                              ];
                             },
-                          ),
+
+                              onSelected: (String value) {
+                                if (value == 'edit permissions') {
+                                  Navigator.push(context,
+                                      MaterialPageRoute(builder: (context) =>
+                                          edit_roles_and_permissions(
+                                            g_index: 0, role_index: 0,)));
+                                }
+
+                                else if (value == 'edit role name') {
+                                  Navigator.push(context,
+                                      MaterialPageRoute(builder: (context) =>
+                                          change_role_name(
+                                            curr_role_name: roles[k],
+                                            g_index: 0,
+                                            index_for_role: 0,)));
+                                }
+
+                                else if (value == 'delete') {
+                                  _showDialog_for_confirm_delete_account(
+                                      context, groups[k].Group_name);
+                                }
+                              },
+                            )
+                          : Text(""),
+
 
                           SizedBox(height: 2.5),
 

@@ -25,7 +25,15 @@ const userSchema = Schema({
 
         type: Boolean,
         required: true
-    }
+    },
+    groups: [{
+        type: mongoose.Types.ObjectId,
+        ref: 'Conversation'
+    }],
+    dms: [{
+        type: mongoose.Types.ObjectId,
+        ref: 'DM'
+    }]
 });
 
 userSchema.pre("save", function(next){

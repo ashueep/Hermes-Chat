@@ -18,6 +18,7 @@ class create_account extends StatefulWidget {
 class _create_accountState extends State<create_account> {
   @override
   final Name_controller = TextEditingController();
+  final UserName_controller = TextEditingController();
   final email_controller = TextEditingController();
   final password_controller = TextEditingController();
   final confirm_password_controller = TextEditingController();
@@ -91,6 +92,42 @@ class _create_accountState extends State<create_account> {
                 color: Colors.white,
               ),
               hintText: 'Enter your full name',
+              hintStyle: kHintTextStyle,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _build_username_field() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          'UserName',
+          style: kLabelStyle,
+        ),
+        SizedBox(height: 10.0),
+        Container(
+          alignment: Alignment.centerLeft,
+          decoration: kBoxDecorationStyle,
+          height: 60.0,
+          child: TextField(
+            controller: UserName_controller,
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: 'OpenSans',
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.only(top: 14.0),
+              prefixIcon: Icon(
+                Icons.email,
+                color: Colors.white,
+              ),
+              hintText: 'Enter a UserName ',
               hintStyle: kHintTextStyle,
             ),
           ),
@@ -215,7 +252,7 @@ class _create_accountState extends State<create_account> {
       child: RaisedButton(
         elevation: 5.0,
         onPressed: () async {
-          final List<String> reponse_from_API_for_create_account = await send_create_account((Name_controller.text).toString(),(password_controller.text).toString(),(email_controller.text).toString());
+          final List<String> reponse_from_API_for_create_account = await send_create_account((Name_controller.text).toString(),(password_controller.text).toString(),(email_controller.text).toString(),(UserName_controller.text).toString());
           reponse_from_API_for_create_account[1]=="true" ?
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => LoginScreen())) : _showDialog_for_failed_account_creation(context, reponse_from_API_for_create_account[0]);
@@ -293,6 +330,8 @@ class _create_accountState extends State<create_account> {
                         height: 30.0,
                       ),
                       _buildEmailTF(),
+                      SizedBox(height: 30.0),
+                      _build_username_field(),
                       SizedBox(height: 30.0),
                       _buildPasswordToCreateTF(),
                       SizedBox(height: 30.0),

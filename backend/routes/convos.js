@@ -4,22 +4,9 @@ const conversation = require('../models/conversation.model')
 const message = require('../models/message.model')
 const User = require('../models/users.model')
 
-//TODO: to add user auth
-
-/*
-groupPermissions
-1: add channels
-2: add roles
-3: add/remove members
-*/
-
-/*
-channelPermissions
-1: view messages
-2: send message
-3: 
-
-*/
+//Middleware
+const auth = require("../middleware/auth")
+const isGroupMember = require('../middleware/isGroupMember')
 
 router.get('/allgroups/', async (req, res) => {
     try {
@@ -30,16 +17,145 @@ router.get('/allgroups/', async (req, res) => {
     }
 })
 
-router.post('/create/', async (req, res) => {
+//Used while loading groups page
+/*
+    Send:
+    1. Group id
+    2. Group name
+    3. List of user roles (For edit name and delete group)
+*/
+router.post('/getGroups/', auth, async (req, res) => {
+
     try {
-        const creator = await User.findOne({ username: req.body.username })
+
+        await res.user.populate({
+            path: 'groups',
+            model: 'Conversation',
+            select: {'name': 1, 'members': 1, 'roles': 1}
+        });
+
+        let index = 0
+        let result = []
+
+        for(let group of res.user.groups){
+
+            result.push({_id: group._id, name: group.name, user_roles: []})
+
+            //Find user member from group member list
+            let member = group.members.find(some_member => some_member.memberID.toString() == res.user._id.toString())
+            if(!member){
+                res.status(500).json({message: `Member record of corresponding user not found in group ${group.name}`, success: false})
+            }
+
+            for(let user_role of member.roles){
+
+                let found_role = group.roles.find(some_role => some_role.name == user_role)
+                if(!found_role){
+                    res.status(500).json({message: `Role ${user_role} not found in group ${group.name}`, success: false})
+                }
+
+                result[index].user_roles.push(found_role)
+            }
+
+            index++
+        }
+
+        res.status(200).json({message: "Groups found", groups: result, success: true})
+    } catch (err){
+
+        res.status({message: err.message, success: false})
+    }
+})
+
+//Used while loading specific group
+/*
+    Send:
+    1. Group id
+    2. Group name
+    3. List of user roles (For edit name and delete channel)
+    4. List of channels (name and ids)
+
+*/
+router.post('/:id/getGroup/', auth, isGroupMember, async (req, res) => {
+
+    try{
+
+        let group = {}
+        group._id = ""
+        group.name = ""
+        group.user_roles = []
+        group.channels = []
+
+        group._id= res.group._id
+        group.name = res.group.name
+
+        //Find user's member record in member list
+        const member = res.group.members.find(some_member =>
+            some_member.memberID.toString() == res.user._id.toString())
+        //Get all user's roles
+        group.user_roles = res.group.roles.filter(role => member['roles'].some(user_role => user_role === role.name))
+
+        //Get channels to whuich user has view permission
+        let channelSet = new Set()
+        let user_roles = []
+        for(let user_role of member.roles) {
+
+            //Find role in roles array
+            let found_role = res.group.roles.find(some_role => some_role.name == user_role)
+            if(!found_role){
+
+                return res.status(404).json({message: `User role "${user_role}" not found in group`, success: false})
+            }
+            user_roles.push(found_role)
+
+            if(found_role.channelPermissions){
+
+                for(let chaPerm of found_role.channelPermissions){
+
+                    let channel_index = res.group.channels.findIndex(channel => channel.name == chaPerm.chaName)
+                    if(channel_index == -1){
+
+                        return res.status(404).json({message: `Channel "${chaPerm.chaName}" not found in group`, success: false})
+                    }
+
+                    if(chaPerm.permissions.includes(1) && !channelSet.has(chaPerm.chaName)){
+
+                        channelSet.add(chaPerm.chaName)
+
+                        group.channels.push({
+                            _id: res.group.channels[channel_index]._id, 
+                            chaName: res.group.channels[channel_index].name
+                        })
+                    }
+                
+                }
+            }
+        }
+        
+        //Return group details
+        res.status(200).json({
+            message: `Fetched group "${group.name}"`, 
+            group_name : res.group.name,
+            all_roles: res.group.roles,
+            user_roles: user_roles, channels: group.channels, success: true
+        })
+        
+    } catch(err){
+
+        res.status(500).json({message: err.message, success: false})
+    }
+})
+
+router.post('/create/', auth, async (req, res) => {
+    try {
+        const creator = res.user
 
         const convo = new conversation({
             name: req.body.name,
             creatorID: creator._id,
             members: [{
                 memberID: creator._id,
-                roles: ['Admin'] 
+                roles: ['Admin', 'Everyone'] 
             }],
             channels: [{
                 name: 'general',
@@ -47,232 +163,60 @@ router.post('/create/', async (req, res) => {
             }],
             roles: [{
                 name: 'Admin',
-                groupPermissions: [1,2,3,4,5,6,7],
+                groupPermissions: [1,2,3,4,5],
                 channelPermissions: [{
                     chaName: 'general',
-                    permissions: [1,2,3,4,5,6,7]
+                    permissions: [1,2,3]
                 }]
-            }]
+            },
+            {
+                name: 'Everyone',
+                groupPermissions: [],
+                channelPermissions: [{
+                    chaName: 'general',
+                    permissions: [1,2]
+                }]
+            }],
+            events: []
         })
 
+        res.user.groups.push(convo._id)
+        await res.user.save()
+        console.log(convo)
         const toSend = await convo.save();
-        res.status(201).json(toSend)
+        res.status(201).json({group: toSend, message: "Group has been created successfully", success: true})
 
     } catch(err) {
-        res.status(400).json(err)
+        res.status(500).json(err)
     }
 })
 
-router.post('/:id/addchannel/', async (req, res) => {
-    try{
 
-        const convo = await conversation.findOne({ _id : req.params.id });
-        const username = await User.findOne({ username : req.body.username });
-        const user = username._id;
-        
-        var userRoles = []
-        // 
-        for(const element of convo['members']){
-            console.log('id', element['memberID'])
-            if( element['memberID'].toString() == user._id.toString()){
-                console.log('in the if')
-                userRoles = element['roles']
-                break;
-            }
-        }
-        console.log('user:', userRoles)
-        if( userRoles == [] ) {
-            console.log('denied here : 1')
-            res.status(401).send("Permission Denied.")
-        } else {
-            var perms = []
-            userRoles.forEach(urole => {
-                convo['roles'].forEach(role => {
-                    if(urole == role['name']){ 
-                        console.log('hiii', role['groupPermissions'])
-                        perms = perms.concat(role['groupPermissions'])
-                    }
-                })
-            })
-            console.log('perms', perms)
-            if(  perms.includes(1) == false ) {
-                console.log('denied here : 2')
-                res.status(401).send("Permission Denied.")
-                return;
-            }
-        }
-        //
-
-        convo['channels'].push({
-            name: req.body.name,
-            messages: [],
-        })
-
-        var hp = {};
-
-        if(req.body.view != null){
-            console.log('in this1 statement')
-            var allroles = req.body.view
-            //allroles = ["Faculty", "Admin", "Student"]
-            //1: roles = "Faculty"
-            //2: roles = "Admin"
-            for(const role of allroles){
-                for(let i = 0 ; i < convo['roles'].length ; i++){
-                    if(convo['roles'][i]['name'] == role){
-                        convo['roles'][i]['channelPermissions'].push({
-                            chaName: req.body.name,
-                            permissions: [1]
-                        })
-                        hp[role] = i;
-                    }
-                }
-            }
-        }
-
-        if(req.body.write != null){
-            console.log('in this other statement')
-            var allroles = req.body.write
-            //allroles = ["Faculty", "Admin"]
-            //1: roles = "Faculty"
-            //2: roles = "Admin"
-            for(const role of allroles){
-                for(let i = 0 ; i < convo['roles'].length ; i++){
-                    if(convo['roles'][i]['name'] == role){
-                        if(hp[role] == null){
-                            convo['roles'][i]['channelPermissions'].push({
-                                chaName: req.body.name,
-                                permissions: [2]
-                            })
-                        } else {
-                            convo['roles'][i]['channelPermissions'][hp[role]]['permissions'].push(2);
-                        }
-                    }
-                }
-            }
-        }
-
-        const toSend = await convo.save()
-        res.status(201).json(toSend)
-
-    } catch(err) {
-        res.status(201).json(err);
-    }
-})
-
-router.post('/:id/addrole/', async (req, res) => {
-    try{
-
-        const convo = await conversation.findOne({ _id : req.params.id });
-        const username = await User.findOne({ username : req.body.username });
-        const user = username._id;
-        
-        var userRoles = []
-        // 
-        for(const element of convo['members']){
-            console.log('id', element['memberID'])
-            if( element['memberID'].toString() == user._id.toString()){
-                console.log('in the if')
-                userRoles = element['roles']
-                break;
-            }
-        }
-        console.log('user:', userRoles)
-        if( userRoles == [] ) {
-            console.log('denied here : 1')
-            res.status(401).send("Permission Denied.")
-        } else {
-            var perms = []
-            userRoles.forEach(urole => {
-                convo['roles'].forEach(role => {
-                    if(urole == role['name']){ 
-                        console.log('hiii', role['groupPermissions'])
-                        perms = perms.concat(role['groupPermissions'])
-                    }
-                })
-            })
-            console.log('perms', perms)
-            if(  perms.includes(2) == false ) {
-                console.log('denied here : 2')
-                res.status(401).send("Permission Denied.")
-                return;
-            }
-        }
-        //
-
-        convo['roles'].push({
-            name: req.body.role,
-            groupPermissions: req.body.groupPermissions,
-            channelPermissions: req.body.channelPermissions
-        })
-
-        const toSend = await convo.save()
-        res.status(201).json(toSend)
-
-    } catch(err) {
-        res.status(201).json(err);
-    }
-})
-
-/* 
-{
-    username: 
-    roles: []
-}
-*/
-
-router.post('/:id/adduser/', async (req, res) => {
+router.post("/:id/exitGroup", auth, isGroupMember, async(req, res) => {
     try {
-        const convo = await conversation.findOne({ _id : req.params.id });
-        const user = await User.findOne({ username : req.body.username });
-
-        console.log('trying', user._id)
-
-        var userRoles = []
-        // 
-        for(const element of convo['members']){
-            console.log('id', element['memberID'].toString())
-            if( element['memberID'].toString() == user._id.toString()){
-                console.log('in the if')
-                userRoles = element['roles']
-                break;
-            }
+        const user_id = res.user._id;
+        const ind = res.group["members"].indexOf(x => x["memberID"] == user_id);
+        
+        var count = 0;
+        for(let i=0; i<res.group["members"].length; i++){
+            if(res.group["members"][i]["roles"].includes("Admin")){
+                count = count+1;
+            };
         }
-        console.log('user:', userRoles)
-        if( userRoles == [] ) {
-            console.log('denied here : 1')
-            res.status(401).send("Permission Denied.")
-        } else {
-            var perms = []
-            userRoles.forEach(urole => {
-                convo['roles'].forEach(role => {
-                    if(urole == role['name']){ 
-                        console.log('hiii', role['groupPermissions'])
-                        perms = perms.concat(role['groupPermissions'])
-                    }
-                })
-            })
-            console.log('perms', perms)
-            if(  perms.includes(3) == false ) {
-                console.log('denied here : 2')
-                res.status(401).send("Permission Denied.")
-                return;
-            }
+        
+        if(res.group["members"][ind]["roles"].includes("Admin") && count == 1){
+            return res.status(400).json({message: "Atleast one admin is needed in the group!", success: false})
         }
-        //
-        const member = await User.findOne({ username : req.body.member });
 
-        console.log('member', member._id)
+        res.group["members"] = res.group["members"].filter(x => x["memberID"] != user_id);
+        res.user["groups"] = res.user["groups"].filter(x => x != req.params.id)
 
-        convo['members'].push({
-            memberID: member._id,
-            roles: req.body.roles
-        })
+        await res.group.save();
+        await res.user.save();
 
-        const toSend = await convo.save()
-        res.status(201).json(toSend)
-
-    } catch(err) {
-        res.status(400).json(err)
+        res.status(200).json({message: "You have exited the group.", success: true})
+    } catch (error) {
+        res.status(500).json({message: error.message, success: false})
     }
 })
 

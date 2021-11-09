@@ -9,17 +9,19 @@ const fs = require('fs')
 
 //For debug purposes only
 //Getting all
+/*
 router.get('/getAccounts/',  async (req, res) => {
 
     try {
 
         const users = await User.find()
-        res.json(users)
+        res.status(200).json({users: users, success: true})
     } catch (err) {
 
-        res.status(500).json({ message: err.message })  //Status 500: Internal Server Error
+        res.status(500).json({ message: err.message, success: false })  //Status 500: Internal Server Error
     }
 })
+*/
 
 //For debug purposes only
 //Getting one
@@ -28,10 +30,10 @@ router.get('/getAccount/:id', async (req, res) => {
     try{
         
         let user =await User.findById(req.params.id)
-        res.status(200).json(user)
+        res.status(200).json({user: user, success: true})
     } catch (err){
 
-        res.status(500).json({message: err.message})    //Status 500: Internal Server Error
+        res.status(500).json({message: err.message, success: false})    //Status 500: Internal Server Error
     }
 })
 
@@ -43,14 +45,14 @@ router.post('/createAccount', async (req, res) => {
 
         if(!validateEmail(req.body.email)){
 
-            return res.status(400).json({message: "Email is not valid", created: false})
+            return res.status(400).json({message: "Email is not valid", created: false, success: false})
         }
 
         //Check if user with given email already exists
         oldUsers = await User.find({email : req.body.email})
         if(!oldUsers || oldUsers.length){
 
-            res.status(401).json({message: "Account with given email already exists", created: false})
+            res.status(401).json({message: "Account with given email already exists", created: false, success: false})
         }
         else{
 
@@ -61,7 +63,7 @@ router.post('/createAccount', async (req, res) => {
             oldUsers = await User.find({username: username})
             if(!oldUsers || oldUsers.length){
 
-                return res.status(400).json({message: "username already exists", created: false})
+                return res.status(400).json({message: "username already exists", created: false, success: false})
             }
 
             if(!("fullname" in req.body) || !req.body.fullname || !(req.body.fullname.length)){
@@ -83,16 +85,16 @@ router.post('/createAccount', async (req, res) => {
             try{
         
                 const newUser = await user.save()
-                res.status(201).json({newUser: newUser, message: "Account created successfully", created: true})   //Status 201: Created
+                res.status(201).json({newUser: newUser, message: "Account created successfully", created: true, success: true})   //Status 201: Created
             }catch (err) {
         
-                res.status(400).json({ message: err.message, created: false })  //Status 400: Bad Request
+                res.status(400).json({ message: err.message, created: false, success: false })  //Status 400: Bad Request
             }
         }
 
     } catch(err){
 
-        res.status(500).json({message : err.message, created: false})
+        res.status(500).json({message : err.message, created: false, success: false})
     }    
 })
 
@@ -111,10 +113,10 @@ router.patch('/modifyAccount', auth, async (req, res) => {
     try{
     
         const updatedUser = await res.user.save()
-        res.json(updatedUser)
+        res.status(200).json({updatedUser: updatedUser, message: "User successfully updated", success: true})
     }catch (err) {
     
-        res.status(400).json({ message: err.message })  //Status 400: Bad Request
+        res.status(400).json({ message: err.message, success: false })  //Status 400: Bad Request
     }
 })
 
@@ -124,10 +126,10 @@ router.delete('/deleteAccount', auth, async (req, res) => {
     try {
 
         await res.user.remove()
-        res.json({ message: 'Deleted User' })
+        res.status(200).json({ message: 'Deleted User', success: true })
     } catch (err){
 
-        res.status(500).json({ message: err.message })  //Status 500: Internal Server Error
+        res.status(500).json({ message: err.message, success: false })  //Status 500: Internal Server Error
     }
 })
 
@@ -141,14 +143,14 @@ router.post('/login', async (req, res) => {
         const user = await User.findOne({email: req.body.email})
         if(!user){
 
-            return res.status(404).json({message: "User with given email not found. Please create an account", logstatus: false})
+            return res.status(404).json({message: "User with given email not found. Please create an account", logstatus: false, success: false})
         }
         res.user = user
 
 
         if(res.user.logstatus){
 
-            res.status(200).json({message: "User is already logged in", logstatus: res.user.logstatus})
+            res.status(200).json({message: "User is already logged in", logstatus: res.user.logstatus, success: false})
         }
         else{
             
@@ -157,7 +159,7 @@ router.post('/login', async (req, res) => {
 
                 if(!match){
 
-                    return res.status(401).json({message: "Wrong email or password", logstatus: res.user.logstatus})  //Status 401: Unauthorized
+                    return res.status(401).json({message: "Wrong email or password", logstatus: res.user.logstatus, success: false})  //Status 401: Unauthorized
                 }
                 else{
 
@@ -181,14 +183,14 @@ router.post('/login', async (req, res) => {
                         }
                         //file written successfully
                     })
-                    res.status(200).json({message: "Login successful", logstatus: res.user.logstatus, token: token}) //Status 200: OK
+                    res.status(200).json({message: "Login successful", logstatus: res.user.logstatus, token: token,username: res.user.username, success: true}) //Status 200: OK
                 }
             })
         }
         
     } catch(err){
 
-        res.status(500).json({message: err.message})    //Status 500: Internal server error
+        res.status(500).json({message: err.message, success: false})    //Status 500: Internal server error
     }
 })
 
@@ -199,7 +201,7 @@ router.post('/logout', auth, async (req, res) => {
 
         if(!res.user.logstatus){
                 
-            res.status(200).json({message: "User is already logged out", logstatus: res.user.logstatus})
+            res.status(200).json({message: "User is already logged out", logstatus: res.user.logstatus, success: false})
         }
         else{
     
@@ -207,12 +209,12 @@ router.post('/logout', auth, async (req, res) => {
             res.user.logstatus = false
             await res.user.save()
             
-            res.status(200).json({message: "Logout successful", logstatus: res.user.logstatus})
+            res.status(200).json({message: "Logout successful", logstatus: res.user.logstatus, success: true})
         }
     }
     catch(err){
 
-        res.status(500).json({message: err.message})    //Status 500: Internal server error
+        res.status(500).json({message: err.message, success: false})    //Status 500: Internal server error
     }
     
 })

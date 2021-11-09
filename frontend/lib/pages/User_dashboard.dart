@@ -8,7 +8,6 @@ import 'package:chat_app_project/widgets/messages_sent_recieved.dart';
 import 'package:chat_app_project/widgets/recent_chats_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'create_new_DM.dart';
 import 'create_new_group.dart';
 
@@ -78,7 +77,7 @@ class _User_dashboard_state extends State<User_dashboard> {
               itemBuilder: (context) => [
                 PopupMenuItem<int>(
                   value: 0,
-                  child: Text("LOGOUT",style: TextStyle(fontWeight: FontWeight.bold),),
+                  child: Text("LOGOUT",style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),),
                 ),
               ],onSelected: (item) => menu_handler(context, item,),
             ),

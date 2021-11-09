@@ -6,10 +6,10 @@ import 'package:chat_app_project/widgets/Groups_chats.dart';
 import 'package:chat_app_project/widgets/messages_sent_recieved.dart';
 import 'package:chat_app_project/widgets/recent_chats_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+
 
 class Group_Page extends StatefulWidget {
-  Group_Page({Key? key}) : super(key: key);
+
 
   @override
   _Group_PageState createState() => _Group_PageState();
@@ -40,13 +40,13 @@ class _Group_PageState extends State<Group_Page> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: true ? FloatingActionButton(
         onPressed: () {
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => create_new_account()));
+              MaterialPageRoute(builder: (context) => create_new_group_hermes()));
         },
         child: const Icon(Icons.add_circle_outline_sharp),
-      ),
+      ): SizedBox.shrink(),
       backgroundColor: Colors.red,
       appBar: AppBar(
         centerTitle: true,

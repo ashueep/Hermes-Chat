@@ -1,4 +1,5 @@
 import 'package:chat_app_project/models/Sending_login_credentials_to_API.dart';
+import 'package:chat_app_project/models/sending_newDM_creation_request_to_API.dart';
 import 'package:chat_app_project/pages/Groups_Page.dart';
 import 'package:chat_app_project/pages/User_dashboard.dart';
 import 'package:chat_app_project/pages/create_account_page.dart';
@@ -18,7 +19,7 @@ class _create_new_account_DM extends State<create_new_account_DM> {
   final Password_controller = TextEditingController();
   bool _rememberMe = false;
 
-  void _showDialog_for_create_new_group_failure(BuildContext context,String message) {
+  void _showDialog_for_create_new_DM_failure(BuildContext context,String message) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -82,9 +83,15 @@ class _create_new_account_DM extends State<create_new_account_DM> {
       child: RaisedButton(
         elevation: 5.0,
         onPressed: () async {
-          //final List<String> reponse_from_API_for_login = await sendData((Group_name_controller.text).toString(),(Password_controller.text).toString());
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => Group_Page()));
+          final List<String> reponse_from_API_for_creating_new_DM = await CreateNewDM(Group_name_controller.text);
+          if(reponse_from_API_for_creating_new_DM[3] == "DM created")
+            {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => User_dashboard()));
+            }
+          else{
+            _showDialog_for_create_new_DM_failure(context, reponse_from_API_for_creating_new_DM[3]);
+          }
         },
         padding: EdgeInsets.all(15.0),
         shape: RoundedRectangleBorder(

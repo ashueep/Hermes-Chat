@@ -1,4 +1,5 @@
 import 'package:chat_app_project/models/Sending_login_credentials_to_API.dart';
+import 'package:chat_app_project/models/getting_DM_List.dart';
 import 'package:chat_app_project/pages/User_dashboard.dart';
 import 'package:chat_app_project/pages/create_account_page.dart';
 import 'package:chat_app_project/repeated_colors/repeated_colors.dart';
@@ -131,6 +132,22 @@ class _LoginScreenState extends State<LoginScreen> {
         elevation: 5.0,
         onPressed: () async {
              final List<String> reponse_from_API_for_login = await sendData((Username_controller.text).toString(),(Password_controller.text).toString());
+
+             if(reponse_from_API_for_login[1]=="true")
+               {
+                 final List<String> response_for_requesting_DM_List = await fetch_DM_List(jwt_token);
+                 if(response_for_requesting_DM_List=="true")
+                   {
+                     Navigator.push(context,
+                         MaterialPageRoute(builder: (context) => User_dashboard()));
+                   }
+                 else
+                   {
+                     _showDialog_for_login_failure(context,reponse_from_API_for_login[0]);
+                   }
+
+               }
+
              reponse_from_API_for_login[1]=="true" ?
            Navigator.push(context,
               MaterialPageRoute(builder: (context) => User_dashboard())) : _showDialog_for_login_failure(context,reponse_from_API_for_login[0]);
