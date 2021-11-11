@@ -23,3 +23,11 @@
 2. write
 3. edit (includes channel name and channel permissions)
 4. delete channel (Nobody should have the permission to delete general channel)
+
+## .env content format
+
+1. HTTP_PORT=<integer>
+2. HTTPS_PORT=<integer>
+3. DATABASE_URL=<link to mongodb server>
+4. JWT_EXPIRY=<integer h/d>
+5. JWT_KEY=<random key string>
